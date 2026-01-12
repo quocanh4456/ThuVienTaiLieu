@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đóng góp tài liệu - EduPlatform</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <style>
+        .upload-area { border: 2px dashed #cbd5e1; padding: 40px; text-align: center; border-radius: 12px; cursor: pointer; background: #f8fafc; transition: 0.3s; }
+        .upload-area:hover { border-color: var(--primary-color); background: #eff6ff; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; outline: none; }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">EduPlatform</div>
+        <ul class="nav-links">
+            <li><a href="index.html">← Quay lại Thư viện</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>📤 Đóng góp tài liệu</h1>
+            <div class="avatar">A</div>
+        </header>
+
+        <form id="uploadForm" class="card" style="max-width: 700px; margin: 0 auto;">
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <span style="font-size: 3rem;">☁️</span>
+                <p id="fileNameDisplay">Bấm để chọn file (PDF, Slide, Word...)</p>
+                <input type="file" id="fileInput" name="file" style="display: none;" required>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <div class="form-group">
+                    <label>Tiêu đề tài liệu</label>
+                    <input type="text" name="title" placeholder="VD: Giáo trình Java..." required>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label>Chủ đề</label>
+                        <select name="topic">
+                            <option value="SQL">Cơ sở dữ liệu (SQL)</option>
+                            <option value="Web">Lập trình Web</option>
+                            <option value="AI">Trí tuệ nhân tạo</option>
+                            <option value="Other">Khác</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Loại file</label>
+                        <select name="type">
+                            <option value="PDF">Tài liệu PDF</option>
+                            <option value="DOCX">Word (DOCX)</option>
+                            <option value="PPTX">PowerPoint (PPTX)</option>
+                            <option value="VIDEO">Video bài giảng</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Mô tả</label>
+                    <textarea name="description" rows="3"></textarea>
+                </div>
+
+                <button type="submit" style="width: 100%; padding: 12px; background: var(--success-color); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">
+                    🚀 Tải lên Server
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            if(e.target.files[0]) {
+                document.getElementById('fileNameDisplay').innerText = "✅ Đã chọn: " + e.target.files[0].name;
+                document.getElementById('fileNameDisplay').style.color = "green";
+            }
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const btn = document.querySelector('button[type="submit"]');
+            btn.innerText = "⏳ Đang tải lên...";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('http://localhost:3000/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if(response.ok) {
+                    alert("Thành công! Tài liệu đã được thêm vào thư viện.");
+                    window.location.href = 'index.html'; 
+                } else {
+                    alert("Lỗi: " + result.error);
+                }
+            } catch (error) {
+                console.error(error);
+                alert("Không thể kết nối Server!");
+            } finally {
+                btn.innerText = "🚀 Tải lên Server";
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài học & Quiz - EduPlatform</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<script>
+ window.difyChatbotConfig = {
+  token: '5kyb3HqpAOqpvEtf',
+  inputs: {
+    // You can define the inputs from the Start node here
+    // key is the variable name
+    // e.g.
+    // name: "NAME"
+  },
+  systemVariables: {
+    // user_id: 'YOU CAN DEFINE USER ID HERE',
+    // conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
+  },
+  userVariables: {
+    // avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
+    // name: 'YOU CAN DEFINE USER NAME HERE',
+  },
+ }
+</script>
+<script
+ src="https://udify.app/embed.min.js"
+ id="5kyb3HqpAOqpvEtf"
+ defer>
+</script>
+<style>
+  #dify-chatbot-bubble-button {
+    background-color: #1C64F2 !important;
+  }
+  #dify-chatbot-bubble-window {
+    width: 24rem !important;
+    height: 40rem !important;
+  }
+</style>
+<body>
+    <nav class="sidebar">
+        <div class="logo">EduPlatform</div>
+        <ul class="nav-links">
+            <li><a href="../dashboard/index.html"><span class="nav-icon">📊</span> Tổng quan</a></li>
+            <li><a href="../materials/index.html"><span class="nav-icon">📚</span> Thư viện</a></li>
+            <li><a href="index.html" class="active"><span class="nav-icon">📝</span> Bài học & Quiz</a></li>
+            <li><a href="../admin/index.html"><span class="nav-icon">⚙️</span> Admin</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>Bài học & Kiểm tra</h1>
+            <div class="avatar">A</div>
+        </header>
+
+        <div style="grid-column: 1 / -1;">
+            <h2 class="section-title">Tuần 1: Nhập môn CSDL</h2>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px;">
+                <div class="card">
+                    <span class="tag tag-info">Bài giảng</span>
+                    <h3>Kiến trúc CSDL Quan hệ</h3>
+                    <p style="margin: 10px 0; color: #64748b;">Đã hoàn thành 100%</p>
+                    <div style="width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px;">
+                        <div style="width: 100%; height: 100%; background: var(--success-color); border-radius: 3px;"></div>
+                    </div>
+                </div>
+
+                <div class="card" style="border-left: 5px solid var(--accent-color);">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span class="tag tag-warning">Quiz Bắt buộc</span>
+                        <span style="font-size: 0.9rem;">15 phút</span>
+                    </div>
+                    <h3 style="margin-top: 10px;">Kiểm tra trắc nghiệm Chương 1</h3>
+                    <p style="margin: 10px 0; color: #64748b;">Trạng thái: Chưa làm</p>
+                    <a href="do-quiz.html" style="text-decoration: none;">
+                        <button style="padding: 8px 20px; background: var(--primary-color); color: white; border: none; border-radius: 6px; cursor: pointer;">
+                            Làm bài ngay
+                        </button>
+                    </a>
+                </div>
+            </div>
+
+            <h2 class="section-title">Tuần 2: SQL Cơ bản</h2>
+            <div class="card" style="opacity: 0.7;">
+                <h3>🔒 Nội dung sẽ mở vào ngày 15/10</h3>
+            </div>
+        </div>
+    </main>
+    
+</body>
+</html>

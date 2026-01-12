@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Làm bài thi - EduPlatform</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <style>
+        .question-card { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #f1f5f9; }
+        .option { display: block; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 8px; cursor: pointer; transition: 0.2s; }
+        .option:hover { background-color: #f8fafc; border-color: var(--primary-color); }
+        input[type="radio"] { margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <div style="width: 100%; max-width: 800px; margin: 0 auto; padding: 40px 20px;">
+        
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <div>
+                <a href="index.html" style="text-decoration: none; color: #64748b;">← Quay lại</a>
+                <h1 style="margin-top: 10px;">Quiz: Kiến trúc CSDL</h1>
+            </div>
+            <div style="text-align: right;">
+                <p style="font-size: 0.9rem; color: #64748b;">Thời gian còn lại</p>
+                <h2 style="color: var(--danger-color);">14:30</h2>
+            </div>
+        </header>
+
+        <form class="card">
+            <div class="question-card">
+                <h3>Câu 1: SQL là viết tắt của từ gì?</h3>
+                <label class="option">
+                    <input type="radio" name="q1"> Structured Question Language
+                </label>
+                <label class="option">
+                    <input type="radio" name="q1"> Structured Query Language
+                </label>
+                <label class="option">
+                    <input type="radio" name="q1"> Simple Query Language
+                </label>
+            </div>
+
+            <div class="question-card">
+                <h3>Câu 2: Câu lệnh nào dùng để lấy dữ liệu?</h3>
+                <label class="option">
+                    <input type="radio" name="q2"> GET
+                </label>
+                <label class="option">
+                    <input type="radio" name="q2"> EXTRACT
+                </label>
+                <label class="option">
+                    <input type="radio" name="q2"> SELECT
+                </label>
+            </div>
+
+            <button type="button" onclick="alert('Nộp bài thành công! Điểm số sẽ được cập nhật lên Dashboard.')" 
+                style="width: 100%; padding: 15px; background: var(--primary-color); color: white; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; font-weight: bold;">
+                Nộp bài
+            </button>
+        </form>
+    </div>
+
+</body>
+</html>

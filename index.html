@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>EduPlatform - Chia sẻ tri thức</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, var(--primary-color), #1e40af);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            border-radius: 0 0 50% 50% / 20px;
+        }
+        .search-box {
+            max-width: 600px;
+            margin: 30px auto;
+            position: relative;
+        }
+        .search-input {
+            width: 100%;
+            padding: 20px 50px 20px 20px;
+            border-radius: 30px;
+            border: none;
+            font-size: 1.1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; max-width: 1000px; margin: 50px auto; padding: 0 20px; }
+    </style>
+</head>
+<body>
+    <div style="width: 100%;">
+        <div class="hero-section">
+            <h1 style="font-size: 2.5rem; margin-bottom: 10px;">EduPlatform</h1>
+            <p style="opacity: 0.9;">Nền tảng chia sẻ tài liệu học tập mở dành cho sinh viên</p>
+            
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Tìm kiếm tài liệu, giáo trình, đề thi...">
+                <button class="search-btn" onclick="window.location.href='modules/materials/index.html'">🔍</button>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <a href="modules/materials/upload.html" style="color: white; text-decoration: underline; margin-right: 15px;">📤 Đóng góp tài liệu</a>
+                <a href="modules/dashboard/index.html" style="color: white; text-decoration: underline;">📊 Vào Dashboard</a>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="card" style="text-align: center;">
+                <div style="font-size: 2rem; margin-bottom: 10px;">📚</div>
+                <h3>Kho Tài Liệu</h3>
+                <p>Hàng ngàn giáo trình, slide bài giảng được chia sẻ miễn phí.</p>
+            </div>
+            <div class="card" style="text-align: center;">
+                <div style="font-size: 2rem; margin-bottom: 10px;">🤖</div>
+                <h3>Trợ lý AI</h3>
+                <p>Hỏi đáp thông minh dựa trên nội dung tài liệu với Dify.</p>
+            </div>
+            <div class="card" style="text-align: center;">
+                <div style="font-size: 2rem; margin-bottom: 10px;">⭐</div>
+                <h3>Cộng đồng</h3>
+                <p>Đánh giá, bình luận và bảng xếp hạng thành viên tích cực.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

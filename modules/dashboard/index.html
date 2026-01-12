@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - EduPlatform</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<script>
+ window.difyChatbotConfig = {
+  token: '5kyb3HqpAOqpvEtf',
+  inputs: {
+    // You can define the inputs from the Start node here
+    // key is the variable name
+    // e.g.
+    // name: "NAME"
+  },
+  systemVariables: {
+    // user_id: 'YOU CAN DEFINE USER ID HERE',
+    // conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
+  },
+  userVariables: {
+    // avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
+    // name: 'YOU CAN DEFINE USER NAME HERE',
+  },
+ }
+</script>
+<script
+ src="https://udify.app/embed.min.js"
+ id="5kyb3HqpAOqpvEtf"
+ defer>
+</script>
+<style>
+  #dify-chatbot-bubble-button {
+    background-color: #1C64F2 !important;
+  }
+  #dify-chatbot-bubble-window {
+    width: 24rem !important;
+    height: 40rem !important;
+  }
+</style>
+<body>
+
+    <nav class="sidebar">
+        <div class="logo">EduPlatform</div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="active"><span class="nav-icon">📊</span> Tổng quan</a></li>
+            <li><a href="../materials/index.html"><span class="nav-icon">📚</span> Thư viện</a></li>
+            <li><a href="../quiz/index.html"><span class="nav-icon">📝</span> Bài học & Quiz</a></li>
+            <li><a href="../admin/index.html"><span class="nav-icon">⚙️</span> Admin</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>Dashboard Học Tập</h1>
+            <div class="avatar">A</div>
+        </header>
+
+        <div style="grid-column: 1 / 2;">
+            <section>
+                <h2 class="section-title">Thống kê (Superset Integration)</h2>
+                <div class="card">
+                    <div class="superset-container">
+                        <p>Khu vực nhúng Iframe Apache Superset</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <aside>
+            <h2 class="section-title">Thông báo (n8n)</h2>
+            <div class="card">
+                <span class="tag tag-warning">Nhắc nhở</span>
+                <p>Hoàn thành Quiz SQL trước 23:00</p>
+            </div>
+            <div class="card">
+                <span class="tag tag-danger">Cảnh báo</span>
+                <p>Điểm trung bình thấp hơn mức an toàn!</p>
+            </div>
+        </aside>
+    </main>
+
+</body>
+</html>
