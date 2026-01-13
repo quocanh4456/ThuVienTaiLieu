@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPlatform - Học tập thông minh</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    
+    <style>
+        /* --- 1. CẤU HÌNH NỀN MÀU MỚI --- */
+        body {
+            /* Reset các thuộc tính Flexbox từ style.css chung */
+            display: block !important; 
+            height: auto !important;
+            overflow-y: auto !important;
+
+            /* --- THAY ĐỔI NỀN TẠI ĐÂY --- */
+            /* Sử dụng Gradient màu xanh dương nhẹ chuyển sang tím nhạt */
+            background: linear-gradient(135deg, #dbeafe 0%, #ede9fe 100%);
+            background-attachment: fixed; /* Giữ cố định màu nền khi cuộn */
+            
+            /* Màu dự phòng nếu trình duyệt cũ không load được gradient */
+            background-color: #e0f2fe;
+
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #1e293b; /* Màu chữ chính */
+        }
+
+        /* --- 2. NAVBAR (THANH ĐIỀU HƯỚNG) --- */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            /* Tăng độ đậm của nền trắng mờ để nổi trên nền màu mới */
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px); /* Hiệu ứng kính mờ */
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-radius: 0 0 20px 20px; /* Bo góc nhẹ phía dưới navbar */
+            margin-top: 10px; /* Cách lề trên một chút cho đẹp */
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #2563eb;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-btn {
+            text-decoration: none;
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.95rem;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            margin-left: 10px;
+        }
+
+        .nav-btn:hover { background: rgba(37, 99, 235, 0.1); color: #2563eb; }
+
+        .nav-btn.primary {
+            background-color: #2563eb; /* Đổi nút chính sang màu xanh cho nổi */
+            color: white;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+        }
+        .nav-btn.primary:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        /* --- 3. HERO SECTION --- */
+        .hero {
+            text-align: center;
+            padding: 100px 20px 80px 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .tag-pill {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.9); /* Nền trắng rõ hơn */
+            color: #2563eb;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            border: 1px solid #bfdbfe;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            line-height: 1.1;
+            font-weight: 800;
+            color: #1e293b;
+            margin: 0 0 25px 0;
+            letter-spacing: -1px;
+            /* Tạo hiệu ứng chữ hơi bóng nhẹ */
+            text-shadow: 0 2px 10px rgba(255,255,255,0.5);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #475569; /* Màu chữ tối hơn xíu cho dễ đọc trên nền màu */
+            line-height: 1.6;
+            margin-bottom: 40px;
+            padding: 0 20px;
+            font-weight: 500;
+        }
+
+        .cta-group { display: flex; gap: 20px; justify-content: center; }
+        .btn-lg { padding: 16px 45px; border-radius: 50px; font-weight: bold; text-decoration: none; font-size: 1.1rem; transition: transform 0.2s; display: inline-block; }
+        
+        .btn-blue { 
+            background: #2563eb; 
+            color: white; 
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4); 
+            border: 2px solid transparent;
+        }
+        .btn-blue:hover { transform: translateY(-3px); background: #1d4ed8; box-shadow: 0 15px 35px rgba(37, 99, 235, 0.5); }
+        
+        .btn-outline { 
+            background: rgba(255, 255, 255, 0.8); 
+            color: #2563eb; 
+            border: 2px solid #bfdbfe; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+        }
+        .btn-outline:hover { background: white; border-color: #2563eb; transform: translateY(-3px); }
+
+        /* --- 4. FEATURES SECTION --- */
+        .features-section {
+            background: transparent; 
+            padding: 80px 20px;
+            margin-top: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 35px;
+        }
+
+        .feature-item {
+            /* Nền trắng mờ đậm hơn để nổi bật trên nền màu */
+            background: rgba(255, 255, 255, 0.95); 
+            backdrop-filter: blur(10px);
+            padding: 35px 30px;
+            border-radius: 20px;
+            border: 2px solid rgba(255,255,255,0.8); /* Viền trắng rõ */
+            box-shadow: 0 15px 35px -5px rgba(0,0,0,0.1), 0 5px 15px -5px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .feature-item:hover {
+            box-shadow: 0 25px 50px -10px rgba(37, 99, 235, 0.25);
+            border-color: #bfdbfe;
+            transform: translateY(-8px) scale(1.02);
+        }
+
+        .icon-box { 
+            width: 65px; height: 65px; 
+            background: linear-gradient(135deg, #eff6ff, #dbeafe); /* Gradient cho icon */
+            color: #2563eb; 
+            display: flex; align-items: center; justify-content: center; 
+            border-radius: 18px; 
+            font-size: 2rem; 
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.1);
+        }
+        .feature-item h3 { margin: 0 0 15px 0; font-size: 1.35rem; color: #1e293b; font-weight: 800; }
+        .feature-item p { color: #64748b; margin: 0; line-height: 1.7; font-size: 1rem; }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+            font-size: 0.95rem;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255,255,255,0.3);
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="#" class="logo-text">EduPlatform.</a>
+        <div>
+            <a href="../auth/login.html" class="nav-btn">Đăng nhập</a>
+            <a href="../auth/register.html" class="nav-btn primary">Đăng ký miễn phí</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="tag-pill">✨ Mới: Tích hợp trợ lý AI Gemini Pro</div>
+        <h1>Nền tảng học tập & <br>Chia sẻ tri thức sinh viên</h1>
+        <p>Truy cập kho tài liệu khổng lồ, hỏi đáp cùng trợ lý AI thông minh và kiểm tra kiến thức mọi lúc, mọi nơi. Hoàn toàn miễn phí.</p>
+        
+        <div class="cta-group">
+            <a href="../auth/login.html" class="btn-lg btn-blue">Bắt đầu ngay 🚀</a>
+            <a href="#features" class="btn-lg btn-outline">Tìm hiểu thêm</a>
+        </div>
+    </section>
+
+    <section class="features-section" id="features">
+        <div class="container">
+            <div class="feature-item">
+                <div class="icon-box">📚</div>
+                <h3>Kho Tài Liệu Mở</h3>
+                <p>Tìm kiếm và tải xuống hàng ngàn giáo trình, bài giảng, slide và đề thi cũ chất lượng cao được chia sẻ từ cộng đồng sinh viên.</p>
+            </div>
+
+            <div class="feature-item">
+                <div class="icon-box">⚡</div>
+                <h3>Trợ lý AI</h3>
+                <p>Tích hợp Chatbot thông minh giúp tóm tắt tài liệu, giải thích các khái niệm khó và giải đáp thắc mắc học tập 24/7.</p>
+            </div>
+
+            <div class="feature-item">
+                <div class="icon-box">🎯</div>
+                <h3>Luyện Thi Trắc Nghiệm</h3>
+                <p>Hệ thống bài tập Quiz đa dạng theo môn học với chế độ chấm điểm tự động và lưu lại lịch sử để đánh giá tiến độ.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        © 2026 EduPlatform. Được xây dựng với niềm đam mê giáo dục.
+    </footer>
+
+</body>
+</html>

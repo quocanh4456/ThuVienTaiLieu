@@ -82,4 +82,38 @@
     </main>
 
 </body>
+<ul class="nav-links">
+    <li><a href="#" onclick="logout()" style="color: #ef4444;"><span class="nav-icon">🚪</span> Đăng xuất</a></li>
+</ul>
+<script>
+    // 1. KIỂM TRA ĐĂNG NHẬP (Auth Guard)
+    const userStr = localStorage.getItem('user_info');
+    
+    if (!userStr) {
+        // Chưa đăng nhập -> Đá về trang Login ngay
+        alert("Vui lòng đăng nhập trước!");
+        window.location.href = '../auth/login.html';
+    }
+
+    // 2. HIỂN THỊ TÊN NGƯỜI DÙNG
+    const user = JSON.parse(userStr);
+    const avatarElement = document.querySelector('.avatar'); // Tìm cái vòng tròn chữ A
+    
+    if (avatarElement) {
+        // Lấy chữ cái đầu của tên (Ví dụ: "Tuấn" -> "T")
+        avatarElement.innerText = user.name.charAt(0).toUpperCase();
+        // (Tùy chọn) Thêm title để di chuột vào thấy tên đầy đủ
+        avatarElement.title = "Xin chào, " + user.name; 
+    }
+
+    // 3. HÀM ĐĂNG XUẤT
+    function logout() {
+        if(confirm("Bạn có chắc muốn đăng xuất?")) {
+            // Xóa thông tin trong bộ nhớ trình duyệt
+            localStorage.removeItem('user_info');
+            // Chuyển hướng về trang đăng nhập
+            window.location.href = '../auth/login.html';
+        }
+    }
+</script>
 </html>
