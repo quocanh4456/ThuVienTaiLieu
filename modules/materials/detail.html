@@ -5,178 +5,110 @@
     <title>Chi tiết tài liệu - EduPlatform</title>
     <link rel="stylesheet" href="../../assets/css/style.css">
     <style>
-        .preview-box {
-            height: 650px;
-            background: #e2e8f0;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            border: 1px solid #cbd5e1;
-            position: relative;
-        }
-        .preview-content { width: 100%; height: 100%; border: none; }
+        .preview-box { width: 100%; height: 600px; background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0; margin-top: 20px; }
+        .info-box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); height: fit-content; }
+        .btn-download { display: block; width: 100%; padding: 12px; background: var(--success-color); color: white; text-align: center; border-radius: 8px; text-decoration: none; font-weight: bold; margin-bottom: 20px; cursor: pointer; border: none; }
+        .btn-download:hover { opacity: 0.9; }
     </style>
 </head>
-<script>
- window.difyChatbotConfig = {
-  token: '5kyb3HqpAOqpvEtf',
-  inputs: {
-    // You can define the inputs from the Start node here
-    // key is the variable name
-    // e.g.
-    // name: "NAME"
-  },
-  systemVariables: {
-    // user_id: 'YOU CAN DEFINE USER ID HERE',
-    // conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
-  },
-  userVariables: {
-    // avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
-    // name: 'YOU CAN DEFINE USER NAME HERE',
-  },
- }
-</script>
-<script
- src="https://udify.app/embed.min.js"
- id="5kyb3HqpAOqpvEtf"
- defer>
-</script>
-<style>
-  #dify-chatbot-bubble-button {
-    background-color: #1C64F2 !important;
-  }
-  #dify-chatbot-bubble-window {
-    width: 24rem !important;
-    height: 40rem !important;
-  }
-</style>
 <body>
     <nav class="sidebar">
         <div class="logo">EduPlatform</div>
         <ul class="nav-links">
-            <li><a href="index.html">← Quay lại thư viện</a></li>
-            <hr style="border: 0; border-top: 1px solid #334155; margin: 10px 0;">
-            <li><a href="../dashboard/index.html"><span class="nav-icon">📊</span> Dashboard</a></li>
+            <li><a href="../dashboard/index.html"><span class="nav-icon">📊</span> Tổng quan</a></li>
+            <li><a href="index.html" class="active"><span class="nav-icon">📚</span> Thư viện</a></li>
+            <li><a href="../quiz/index.html"><span class="nav-icon">📝</span> Bài học & Quiz</a></li>
         </ul>
     </nav>
 
-    <main class="main-content">
-        <header class="header">
-            <h1 id="docTitle">Đang tải dữ liệu...</h1>
-            <div class="avatar">A</div>
-        </header>
-
-        <div style="display: grid; grid-template-columns: 3fr 1fr; gap: 30px;">
-            <div>
-                <div class="card" style="padding: 0; overflow: hidden;">
-                    <div class="preview-box" id="previewContainer">
-                        <p style="color: #64748b;">⏳ Đang tải bản xem trước...</p>
-                    </div>
-                </div>
-
-                <div class="card" style="margin-top: 20px;">
-                    <h3>💬 Bình luận</h3>
-                    <div id="reviewsList" style="margin-top: 15px;">
-                        <p style="color: #64748b;">Chưa có bình luận nào.</p>
-                    </div>
-                </div>
+    <main class="main-content" style="grid-template-columns: 2fr 1fr;">
+        <div>
+            <a href="index.html" style="color: #64748b; text-decoration: none;">← Quay lại thư viện</a>
+            <h1 id="docTitle" style="margin-top: 15px;">Đang tải dữ liệu...</h1>
+            
+            <div class="preview-box" id="previewArea">
+                <p>Đang tải bản xem trước...</p>
             </div>
+        </div>
 
-            <aside>
-                <div class="card">
-                    <a id="downloadBtn" href="#" target="_blank" style="text-decoration: none;">
-                        <button style="width: 100%; padding: 15px; background: var(--success-color); color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-bottom: 15px;">
-                            ⬇ Tải xuống
-                        </button>
-                    </a>
-                    
-                    <div style="font-size: 0.9rem; line-height: 1.8;">
-                        <p><strong>Chủ đề:</strong> <span id="docTopic">...</span></p>
-                        <p><strong>Loại file:</strong> <span id="docType">...</span></p>
-                        <p><strong>Lượt tải:</strong> <span id="docDownloads">0</span></p>
-                        <hr style="margin: 10px 0;">
-                        <p><strong>Mô tả:</strong> <span id="docDesc">...</span></p>
-                    </div>
-                </div>
-            </aside>
+        <div class="info-box">
+            <a id="btnDownload" href="#" target="_blank" class="btn-download">⬇ Tải xuống ngay</a>
+            
+            <p><strong>Chủ đề:</strong> <span id="docTopic">...</span></p>
+            <p><strong>Loại file:</strong> <span class="tag" id="docType">...</span></p>
+            <p><strong>Ngày đăng:</strong> <span id="docDate">...</span></p>
+            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+            <p><strong>Mô tả:</strong></p>
+            <p id="docDesc" style="color: #64748b; font-size: 0.95rem; line-height: 1.5;">...</p>
         </div>
     </main>
-    
+
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const docId = urlParams.get('id');
+        // 1. Lấy ID từ trên thanh địa chỉ
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
 
+        if (!id) {
+            alert("Không tìm thấy ID tài liệu!");
+            window.location.href = 'index.html';
+        }
+
+        // 2. Gọi API để lấy dữ liệu
         async function loadDetail() {
-            if (!docId) return alert("Không tìm thấy ID!");
-
             try {
-                const response = await fetch(`http://localhost:3000/api/materials/${docId}`);
-                if (!response.ok) throw new Error("Lỗi kết nối");
-
-                const data = await response.json();
-                const mat = data.material;
+                const res = await fetch(`http://localhost:3000/api/materials/${id}`);
+                const data = await res.json();
                 
-                // 1. Điền thông tin
-                document.getElementById('docTitle').innerText = mat.title;
-                document.getElementById('docTopic').innerText = mat.topic;
-                document.getElementById('docType').innerText = mat.type;
-                document.getElementById('docDownloads').innerText = mat.downloads;
-                document.getElementById('docDesc').innerText = mat.description || "Không có mô tả.";
+                // Vì API trả về mảng [ {id:1, title:...} ] nên ta lấy phần tử số 0
+                const m = data[0]; 
 
-                // 2. Xử lý URL (Chuẩn hóa đường dẫn)
-                let rawPath = mat.file_url ? mat.file_url.replace(/\\/g, '/') : '';
-                if(rawPath && !rawPath.startsWith('http')) {
-                    rawPath = `http://localhost:3000/${rawPath}`;
+                if (!m) {
+                    document.getElementById('docTitle').innerText = "Tài liệu không tồn tại!";
+                    return;
                 }
-                const fileUrl = rawPath;
 
-                // Nút Download
-                document.getElementById('downloadBtn').href = fileUrl;
+                // 3. Hiển thị thông tin lên màn hình
+                document.getElementById('docTitle').innerText = m.title;
+                document.getElementById('docTopic').innerText = m.topic;
+                document.getElementById('docType').innerText = m.type ? m.type.toUpperCase() : 'FILE';
+                document.getElementById('docDesc').innerText = m.description || "Không có mô tả.";
+                document.getElementById('docDate').innerText = new Date(m.created_at).toLocaleDateString('vi-VN');
 
-                // 3. Logic hiển thị Preview (Thông minh)
-                const previewDiv = document.getElementById('previewContainer');
-                const fileExt = fileUrl.split('.').pop().toLowerCase(); // Lấy đuôi file (pdf, pptx, docx)
+                // 4. Xử lý đường dẫn file
+                let fileUrl = m.link;
+                // Nếu link chưa có http://localhost:3000 thì thêm vào
+                if (fileUrl && !fileUrl.startsWith('http')) {
+                    fileUrl = `http://localhost:3000/${fileUrl}`;
+                }
+                document.getElementById('btnDownload').href = fileUrl;
 
-                if (fileUrl && (fileExt === 'pdf' || mat.type === 'PDF')) {
-                    // PDF -> Hiển thị
-                    previewDiv.innerHTML = `
-                        <object data="${fileUrl}" type="application/pdf" class="preview-content">
-                            <div style="text-align:center; padding-top: 150px;">
-                                <p>⚠️ Trình duyệt không hỗ trợ xem trực tiếp.</p>
-                                <a href="${fileUrl}" target="_blank">Bấm để tải về</a>
-                            </div>
-                        </object>`;
-                } else if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExt)) {
-                    // Ảnh -> Hiển thị
-                    previewDiv.innerHTML = `<img src="${fileUrl}" style="max-width: 100%; max-height: 100%; object-fit: contain;">`;
-                } else if (['doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx'].includes(fileExt) || mat.type === 'DOCX' || mat.type === 'PPTX') {
-                    // File Office (Word, PPT) -> Hiện thông báo
-                    previewDiv.innerHTML = `
-                        <div style="text-align:center">
-                            <span style="font-size: 4rem;">📂</span>
-                            <h3 style="margin-top: 10px; color: #334155;">Tài liệu Office</h3>
-                            <p style="color: #64748b;">Trình duyệt không hỗ trợ xem trước định dạng này.</p>
-                            <a href="${fileUrl}" style="display: inline-block; margin-top: 15px; padding: 10px 20px; background: var(--primary-color); color: white; text-decoration: none; border-radius: 6px;">
-                                ⬇ Tải về máy để xem
-                            </a>
-                        </div>`;
-                } else if (mat.type === 'VIDEO' || ['mp4'].includes(fileExt)) {
-                    previewDiv.innerHTML = `<video controls class="preview-content" style="background: black;"><source src="${fileUrl}" type="video/mp4"></video>`;
+                // 5. Xử lý Preview (Xem trước)
+                const preview = document.getElementById('previewArea');
+                const type = m.type ? m.type.toLowerCase() : '';
+
+                if (type === 'pdf') {
+                    preview.innerHTML = `<iframe src="${fileUrl}" width="100%" height="100%" style="border:none;"></iframe>`;
+                } else if (['jpg', 'png', 'jpeg', 'gif'].includes(type)) {
+                    preview.innerHTML = `<img src="${fileUrl}" style="max-width:100%; max-height:100%; object-fit:contain;">`;
+                } else if (type === 'video' || type === 'mp4') {
+                    preview.innerHTML = `<video controls width="100%" height="100%"><source src="${fileUrl}" type="video/mp4"></video>`;
                 } else {
-                    // Các loại khác
-                    previewDiv.innerHTML = `<div style="text-align:center"><p>Không hỗ trợ xem trước.</p><a href="${fileUrl}">Tải về</a></div>`;
+                    preview.innerHTML = `
+                        <div style="text-align:center;">
+                            <p style="font-size:3rem;">📂</p>
+                            <p>Định dạng <b>${type}</b> không hỗ trợ xem trước.</p>
+                            <p>Vui lòng bấm nút <b>Tải xuống</b> để xem.</p>
+                        </div>
+                    `;
                 }
-                
-                // (Phần hiển thị bình luận giữ nguyên như cũ...)
-                
+
             } catch (error) {
                 console.error(error);
-                document.getElementById('docTitle').innerText = "Lỗi tải tài liệu.";
+                alert("Lỗi tải dữ liệu: " + error.message);
             }
         }
-        window.onload = loadDetail;
+
+        loadDetail();
     </script>
 </body>
 </html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - EduPlatform</title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <style>
+        body {
+            background-color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #334155;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background-color: #1e40af;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .btn-login:hover {
+            background-color: #1e3a8a;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h2 style="color: #1e40af; margin-bottom: 5px;">EduPlatform</h2>
+        <p style="color: #64748b; margin-bottom: 30px;">Đăng nhập hệ thống</p>
+
+        <form id="loginForm">
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" id="email" value="student@edu.com" placeholder="Nhập email..." required>
+            </div>
+            
+            <div class="input-group">
+                <label>Mật khẩu</label>
+                <input type="password" id="password" value="123456" placeholder="Nhập mật khẩu..." required>
+            </div>
+
+            <button type="submit" class="btn-login">Đăng nhập</button>
+        </form>
+        
+        <p style="margin-top: 20px; font-size: 0.9rem;">
+            Chưa có tài khoản? <a href="register.html">Đăng ký ngay</a>
+        </p>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Chặn hành động tải lại trang
+
+            // 1. Lấy thông tin từ ô nhập
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.querySelector('.btn-login');
+
+            // Đổi nút thành "Đang xử lý..."
+            const originalText = btn.innerText;
+            btn.innerText = "Đang kết nối...";
+            btn.disabled = true;
+
+            try {
+                // 2. Gửi yêu cầu lên Server (Cổng 3000)
+                const response = await fetch('http://localhost:3000/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // 3. Đăng nhập thành công -> Lưu thông tin
+                    localStorage.setItem('user_info', JSON.stringify(data.user));
+                    
+                    // Chuyển hướng vào Dashboard
+                    window.location.href = '../dashboard/index.html';
+                } else {
+                    // 4. Sai mật khẩu hoặc lỗi khác
+                    alert(data.message || "Đăng nhập thất bại!");
+                }
+            } catch (error) {
+                console.error("Lỗi:", error);
+                alert("⚠️ Lỗi kết nối Server!\nHãy chắc chắn bạn đã chạy lệnh 'node server.js'");
+            } finally {
+                // Trả lại nút như cũ
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+
+</body>
+</html>
