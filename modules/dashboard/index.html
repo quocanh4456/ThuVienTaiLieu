@@ -4,116 +4,317 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - EduPlatform</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <link rel="stylesheet" href="../../assets/css/style.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* --- CẤU HÌNH GIAO DIỆN HIỆN ĐẠI --- */
+        :root {
+            --primary-bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-dark: #1f2937;
+            --text-light: #6b7280;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--primary-bg);
+            margin: 0; display: flex;
+        }
+
+        /* SIDEBAR (MENU TRÁI) */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+            color: white; display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; height: 100vh;
+        }
+        .logo { font-size: 1.5rem; font-weight: bold; margin-bottom: 40px; color: white; display: flex; align-items: center; gap: 10px; }
+        .nav-links { list-style: none; padding: 0; flex-grow: 1; }
+        .nav-links li { margin-bottom: 15px; }
+        .nav-links a { text-decoration: none; color: #94a3b8; display: flex; align-items: center; padding: 12px; border-radius: 10px; transition: 0.3s; }
+        .nav-links a:hover, .nav-links a.active { background-color: rgba(255,255,255,0.1); color: white; }
+        .nav-icon { margin-right: 12px; width: 20px; text-align: center; }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex-grow: 1; padding: 30px; overflow-y: auto; height: 100vh;
+        }
+
+        .header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
+        }
+        .user-profile { display: flex; align-items: center; gap: 15px; }
+        .avatar { width: 45px; height: 45px; background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+
+        /* --- CARD THỐNG KÊ (KPIs) --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 35px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+
+        .icon-box { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+        .card-blue .icon-box { background: #e0f2fe; color: #0284c7; } .card-blue { border-left: 5px solid #0284c7; }
+        .card-green .icon-box { background: #dcfce7; color: #166534; } .card-green { border-left: 5px solid #166534; }
+        .card-purple .icon-box { background: #f3e8ff; color: #9333ea; } .card-purple { border-left: 5px solid #9333ea; }
+        
+        .stat-number { font-size: 2.2rem; font-weight: 600; color: var(--text-dark); margin-bottom: 5px; line-height: 1; }
+        .stat-label { color: var(--text-light); font-size: 0.95rem; font-weight: 500; }
+
+        /* --- BIỂU ĐỒ & THÔNG BÁO --- */
+        .charts-container {
+            display: grid;
+            grid-template-columns: 2.5fr 1fr; /* Bên trái rộng hơn */
+            gap: 25px;
+        }
+
+        .chart-box {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.02);
+            display: flex; flex-direction: column;
+        }
+
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .section-title { font-size: 1.2rem; font-weight: 600; color: var(--text-dark); display: flex; align-items: center; gap: 10px; }
+
+        /* === DANH SÁCH THÔNG BÁO (XẾP NGANG - ROW) === */
+        .notification-list {
+            list-style: none; padding: 0;
+            display: flex;              /* Xếp ngang */
+            flex-direction: row;        /* Hướng ngang */
+            flex-wrap: wrap;            /* Xuống dòng khi hết chỗ */
+            gap: 15px;
+        }
+
+        .notification-item {
+            padding: 15px; border-radius: 12px;
+            display: flex; gap: 15px; align-items: start;
+            background: #f8fafc; transition: 0.2s;
+            border: 1px solid transparent;
+            
+            /* Co giãn linh hoạt: Cơ bản 100%, nhưng nếu màn hình to thì chia cột */
+            flex: 1 1 100%; 
+        }
+        .notification-item:hover { background: #fff; border-color: #e2e8f0; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+
+        .notif-icon-circle { width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0; }
+
+        /* NÚT ĐĂNG XUẤT */
+        .logout-btn { color: #ef4444 !important; transition: 0.3s; cursor: pointer; }
+        .logout-btn:hover { background: rgba(239, 68, 68, 0.1) !important; color: #dc2626 !important; }
+
+        /* Responsive Mobile */
+        @media (max-width: 900px) {
+            .charts-container, .stats-grid { grid-template-columns: 1fr; }
+            .sidebar { display: none; /* Ẩn tạm trên mobile cho gọn */ }
+        }
+    </style>
 </head>
-<script>
- window.difyChatbotConfig = {
-  token: '5kyb3HqpAOqpvEtf',
-  inputs: {
-    // You can define the inputs from the Start node here
-    // key is the variable name
-    // e.g.
-    // name: "NAME"
-  },
-  systemVariables: {
-    // user_id: 'YOU CAN DEFINE USER ID HERE',
-    // conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
-  },
-  userVariables: {
-    // avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
-    // name: 'YOU CAN DEFINE USER NAME HERE',
-  },
- }
-</script>
-<script
- src="https://udify.app/embed.min.js"
- id="5kyb3HqpAOqpvEtf"
- defer>
-</script>
-<style>
-  #dify-chatbot-bubble-button {
-    background-color: #1C64F2 !important;
-  }
-  #dify-chatbot-bubble-window {
-    width: 24rem !important;
-    height: 40rem !important;
-  }
-</style>
 <body>
 
     <nav class="sidebar">
-        <div class="logo">EduPlatform</div>
+        <div class="logo">
+            <i class="fa-solid fa-graduation-cap"></i> EduPlatform
+        </div>
         <ul class="nav-links">
-            <li><a href="index.html" class="active"><span class="nav-icon">📊</span> Tổng quan</a></li>
-            <li><a href="../materials/index.html"><span class="nav-icon">📚</span> Thư viện</a></li>
-            <li><a href="../quiz/index.html"><span class="nav-icon">📝</span> Bài học & Quiz</a></li>
-            <li><a href="../admin/index.html"><span class="nav-icon">⚙️</span> Admin</a></li>
+            <li><a href="index.html" class="active"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span> Tổng quan</a></li>
+            <li><a href="../materials/index.html"><span class="nav-icon"><i class="fa-solid fa-book-open"></i></span> Thư viện</a></li>
+            <li><a href="../quiz/index.html"><span class="nav-icon"><i class="fa-solid fa-pen-to-square"></i></span> Bài học & Quiz</a></li>
+            
+            <li style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+                <a onclick="logout()" class="logout-btn">
+                    <span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span> Đăng xuất
+                </a>
+            </li>
         </ul>
+        <div style="margin-top: auto; padding: 20px; color: #94a3b8; font-size: 0.8rem;">
+            <i class="fa-solid fa-circle-user"></i> Student<br>
+            <i class="fa-solid fa-signal" style="color: #22c55e;"></i> Server Online
+        </div>
     </nav>
 
     <main class="main-content">
         <header class="header">
-            <h1>Dashboard Học Tập</h1>
-            <div class="avatar">A</div>
+            <div>
+                <h1 style="font-size: 1.8rem; color: var(--text-dark);">Dashboard Học Tập</h1>
+                <p style="color: var(--text-light); margin-top: 5px;">Chào mừng quay trở lại, chúc bạn một ngày học tập hiệu quả!</p>
+            </div>
+            <div class="user-profile">
+                <div style="text-align: right;">
+                    <div style="font-weight: bold; color: var(--text-dark);">Nguyễn Văn A</div>
+                    <div style="font-size: 0.8rem; color: var(--text-light);">Sinh viên</div>
+                </div>
+                <div class="avatar">S</div>
+            </div>
         </header>
 
-        <div style="grid-column: 1 / 2;">
-            <section>
-                <h2 class="section-title">Thống kê (Superset Integration)</h2>
-                <div class="card">
-                    <div class="superset-container">
-                        <p>Khu vực nhúng Iframe Apache Superset</p>
-                    </div>
+        <div class="stats-grid">
+            <div class="stat-card card-blue">
+                <div>
+                    <div class="stat-number" id="totalDocs">0</div>
+                    <div class="stat-label">Tài liệu trong kho</div>
                 </div>
-            </section>
+                <div class="icon-box"><i class="fa-solid fa-folder-open"></i></div>
+            </div>
+            <div class="stat-card card-green">
+                <div>
+                    <div class="stat-number" id="avgScore">0.0</div>
+                    <div class="stat-label">Điểm trung bình</div>
+                </div>
+                <div class="icon-box"><i class="fa-solid fa-bullseye"></i></div>
+            </div>
+            <div class="stat-card card-purple">
+                <div>
+                    <div class="stat-number" id="totalTests">0</div>
+                    <div class="stat-label">Bài thi đã làm</div>
+                </div>
+                <div class="icon-box"><i class="fa-solid fa-list-check"></i></div>
+            </div>
         </div>
 
-        <aside>
-            <h2 class="section-title">Thông báo (n8n)</h2>
-            <div class="card">
-                <span class="tag tag-warning">Nhắc nhở</span>
-                <p>Hoàn thành Quiz SQL trước 23:00</p>
+        <div class="charts-container">
+            
+            <div class="chart-box">
+                <div class="section-header">
+                    <div class="section-title"><i class="fa-solid fa-arrow-trend-up" style="color: #2563eb;"></i> Tiến độ học tập</div>
+                    <select style="padding: 5px 10px; border-radius: 6px; border: 1px solid #e2e8f0; outline: none;">
+                        <option>7 ngày qua</option>
+                    </select>
+                </div>
+                <div style="height: 300px; width: 100%;">
+                    <canvas id="learningChart"></canvas>
+                </div>
             </div>
-            <div class="card">
-                <span class="tag tag-danger">Cảnh báo</span>
-                <p>Điểm trung bình thấp hơn mức an toàn!</p>
+
+            <div class="chart-box">
+                <div class="section-header">
+                    <div class="section-title"><i class="fa-regular fa-bell" style="color: #f59e0b;"></i> Thông báo</div>
+                </div>
+                
+                <ul class="notification-list" id="notifList">
+                    <li class="notification-item">
+                        <div class="notif-icon-circle" style="background: #e0f2fe; color: #0284c7;">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <div>
+                            <strong style="font-size: 0.95rem;">Hệ thống (Auto)</strong>
+                            <p style="font-size: 0.85rem; color: #64748b; margin-top: 4px;">Hôm nay bạn chưa làm bài tập nào. Hãy thử sức với bài Quiz Git nhé!</p>
+                        </div>
+                    </li>
+                    </ul>
             </div>
-        </aside>
+        </div>
     </main>
 
-</body>
-<ul class="nav-links">
-    <li><a href="#" onclick="logout()" style="color: #ef4444;"><span class="nav-icon">🚪</span> Đăng xuất</a></li>
-</ul>
-<script>
-    // 1. KIỂM TRA ĐĂNG NHẬP (Auth Guard)
-    const userStr = localStorage.getItem('user_info');
-    
-    if (!userStr) {
-        // Chưa đăng nhập -> Đá về trang Login ngay
-        alert("Vui lòng đăng nhập trước!");
-        window.location.href = '../auth/login.html';
-    }
-
-    // 2. HIỂN THỊ TÊN NGƯỜI DÙNG
-    const user = JSON.parse(userStr);
-    const avatarElement = document.querySelector('.avatar'); // Tìm cái vòng tròn chữ A
-    
-    if (avatarElement) {
-        // Lấy chữ cái đầu của tên (Ví dụ: "Tuấn" -> "T")
-        avatarElement.innerText = user.name.charAt(0).toUpperCase();
-        // (Tùy chọn) Thêm title để di chuột vào thấy tên đầy đủ
-        avatarElement.title = "Xin chào, " + user.name; 
-    }
-
-    // 3. HÀM ĐĂNG XUẤT
-    function logout() {
-        if(confirm("Bạn có chắc muốn đăng xuất?")) {
-            // Xóa thông tin trong bộ nhớ trình duyệt
-            localStorage.removeItem('user_info');
-            // Chuyển hướng về trang đăng nhập
-            window.location.href = '../auth/login.html';
+    <script>
+        // === HÀM ĐĂNG XUẤT ===
+        function logout() {
+            if(confirm('Bạn có chắc chắn muốn đăng xuất không?')) {
+                localStorage.removeItem('user_info');
+                window.location.href = '../auth/login.html';
+            }
         }
-    }
-</script>
+
+        // === HÀM TẢI DỮ LIỆU ===
+        async function loadDashboardData() {
+            try {
+                const res = await fetch('http://localhost:3000/api/dashboard/stats?user_id=2');
+                const data = await res.json();
+
+                // 1. Điền số liệu
+                document.getElementById('totalDocs').innerText = data.total_materials || 0;
+                document.getElementById('avgScore').innerText = data.avg_score || 0;
+                const totalAttempts = data.chart_data ? data.chart_data.length : 0;
+                document.getElementById('totalTests').innerText = totalAttempts;
+
+                // 2. Vẽ biểu đồ
+                if (data.chart_data && data.chart_data.length > 0) {
+                    const ctx = document.getElementById('learningChart').getContext('2d');
+                    let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                    gradient.addColorStop(0, 'rgba(37, 99, 235, 0.5)');
+                    gradient.addColorStop(1, 'rgba(37, 99, 235, 0.0)');
+
+                    const chartData = data.chart_data.reverse(); 
+
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: chartData.map(item => item.title),
+                            datasets: [{
+                                label: 'Điểm số',
+                                data: chartData.map(item => item.score),
+                                borderColor: '#2563eb',
+                                backgroundColor: gradient,
+                                borderWidth: 3,
+                                pointBackgroundColor: '#ffffff',
+                                pointBorderColor: '#2563eb',
+                                fill: true,
+                                tension: 0.4 
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: {
+                                y: { beginAtZero: true, max: 10, grid: { borderDash: [5, 5], color: '#f1f5f9' } },
+                                x: { grid: { display: false } }
+                            }
+                        }
+                    });
+                } else {
+                    document.getElementById('learningChart').parentElement.innerHTML = `
+                        <div style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8;">
+                            <i class="fa-solid fa-chart-line" style="font-size: 3rem; margin-bottom: 10px; opacity: 0.3;"></i>
+                            <p>Chưa có dữ liệu biểu đồ</p>
+                        </div>`;
+                }
+
+                // 3. Thông báo thông minh
+                const notifList = document.getElementById('notifList');
+                const score = parseFloat(data.avg_score);
+
+                if (score >= 8.0) {
+                    notifList.innerHTML += `
+                        <li class="notification-item">
+                            <div class="notif-icon-circle" style="background: #dcfce7; color: #166534;"><i class="fa-solid fa-trophy"></i></div>
+                            <div><strong style="color: #166534;">Xuất sắc!</strong><p style="font-size: 0.85rem; color: #64748b;">Điểm TB: <b>${score}</b>. Giữ vững phong độ nhé.</p></div>
+                        </li>`;
+                } else if (score < 5.0 && score > 0) {
+                    notifList.innerHTML += `
+                        <li class="notification-item">
+                            <div class="notif-icon-circle" style="background: #fee2e2; color: #991b1b;"><i class="fa-solid fa-circle-exclamation"></i></div>
+                            <div><strong style="color: #991b1b;">Cảnh báo</strong><p style="font-size: 0.85rem; color: #64748b;">Điểm số thấp. Cần ôn tập ngay.</p></div>
+                        </li>`;
+                }
+
+            } catch (error) { console.error(error); }
+        }
+
+        loadDashboardData();
+    </script>
+</body>
 </html>
