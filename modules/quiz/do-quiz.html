@@ -2,63 +2,208 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Làm bài thi - EduPlatform</title>
     <link rel="stylesheet" href="../../assets/css/style.css">
     <style>
-        .question-card { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #f1f5f9; }
-        .option { display: block; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 8px; cursor: pointer; transition: 0.2s; }
-        .option:hover { background-color: #f8fafc; border-color: var(--primary-color); }
-        input[type="radio"] { margin-right: 10px; }
+        .quiz-container { max-width: 800px; margin: 0 auto; }
+        .question-card { background: white; padding: 25px; border-radius: 12px; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .question-text { font-weight: bold; font-size: 1.1rem; margin-bottom: 20px; color: #1e293b; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px; }
+        
+        /* Style cho đáp án đẹp hơn */
+        .option-label { 
+            display: flex; 
+            align-items: center; 
+            padding: 12px 15px; 
+            border: 2px solid #e2e8f0; 
+            border-radius: 8px; 
+            margin-bottom: 10px; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            background: #f8fafc;
+        }
+        .option-label:hover { 
+            background: #eff6ff; 
+            border-color: #3b82f6; 
+        }
+        /* Khi được chọn thì đổi màu */
+        .option-input:checked + span {
+            font-weight: bold;
+            color: #2563eb;
+        }
+        .option-label:has(.option-input:checked) {
+            border-color: #2563eb;
+            background-color: #eff6ff;
+        }
+
+        .option-input { 
+            margin-right: 15px; 
+            transform: scale(1.2); 
+            cursor: pointer;
+        }
+        
+        .timer-box { position: fixed; top: 20px; right: 20px; background: #1e293b; color: white; padding: 10px 20px; border-radius: 30px; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 100; }
+        .btn-submit { width: 100%; padding: 15px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3); transition: 0.2s;}
+        .btn-submit:hover { background: #1d4ed8; transform: translateY(-2px); }
     </style>
 </head>
 <body>
-    <div style="width: 100%; max-width: 800px; margin: 0 auto; padding: 40px 20px;">
-        
-        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-            <div>
-                <a href="index.html" style="text-decoration: none; color: #64748b;">← Quay lại</a>
-                <h1 style="margin-top: 10px;">Quiz: Kiến trúc CSDL</h1>
-            </div>
-            <div style="text-align: right;">
-                <p style="font-size: 0.9rem; color: #64748b;">Thời gian còn lại</p>
-                <h2 style="color: var(--danger-color);">14:30</h2>
-            </div>
-        </header>
 
-        <form class="card">
-            <div class="question-card">
-                <h3>Câu 1: SQL là viết tắt của từ gì?</h3>
-                <label class="option">
-                    <input type="radio" name="q1"> Structured Question Language
-                </label>
-                <label class="option">
-                    <input type="radio" name="q1"> Structured Query Language
-                </label>
-                <label class="option">
-                    <input type="radio" name="q1"> Simple Query Language
-                </label>
-            </div>
+    <div class="timer-box">⏳ <span id="timer">--:--</span></div>
 
-            <div class="question-card">
-                <h3>Câu 2: Câu lệnh nào dùng để lấy dữ liệu?</h3>
-                <label class="option">
-                    <input type="radio" name="q2"> GET
-                </label>
-                <label class="option">
-                    <input type="radio" name="q2"> EXTRACT
-                </label>
-                <label class="option">
-                    <input type="radio" name="q2"> SELECT
-                </label>
-            </div>
+    <main class="main-content">
+        <div class="quiz-container">
+            <a href="index.html" style="text-decoration: none; color: #64748b; display: inline-block; margin-bottom: 20px;">← Quay lại danh sách</a>
+            <h1 id="quizTitle" style="margin: 0 0 30px 0; font-size: 2rem;">Đang tải đề thi...</h1>
+            
+            <form id="quizForm">
+                <div id="questionsArea">
+                    <p style="text-align: center; color: #64748b;">⏳ Đang tải câu hỏi...</p>
+                </div>
+                <button type="submit" class="btn-submit">Nộp bài</button>
+            </form>
+        </div>
+    </main>
 
-            <button type="button" onclick="alert('Nộp bài thành công! Điểm số sẽ được cập nhật lên Dashboard.')" 
-                style="width: 100%; padding: 15px; background: var(--primary-color); color: white; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; font-weight: bold;">
-                Nộp bài
-            </button>
-        </form>
-    </div>
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const quizId = params.get('id');
+        let questionsList = []; 
 
+        if(!quizId) {
+            alert("Không tìm thấy bài thi!");
+            window.location.href = 'index.html';
+        }
+
+        // --- HÀM QUAN TRỌNG: SỬA LỖI HIỂN THỊ THẺ HTML ---
+        function escapeHtml(text) {
+            if (!text) return "";
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        async function loadQuiz() {
+            try {
+                const res = await fetch(`http://localhost:3000/api/quizzes/${quizId}`);
+                if(!res.ok) throw new Error("Lỗi kết nối");
+                
+                const data = await res.json();
+
+                document.getElementById('quizTitle').innerText = data.quiz.title;
+                questionsList = data.questions;
+
+                const area = document.getElementById('questionsArea');
+                area.innerHTML = '';
+                
+                if(data.questions.length === 0) {
+                    area.innerHTML = '<p>Đề thi này chưa có câu hỏi nào.</p>';
+                    return;
+                }
+
+                data.questions.forEach((q, index) => {
+                    // Dùng hàm escapeHtml bao quanh các đáp án
+                    const html = `
+                        <div class="question-card">
+                            <div class="question-text">Câu ${index + 1}: ${escapeHtml(q.question_text)}</div>
+                            
+                            <label class="option-label">
+                                <input type="radio" name="${q.question_id}" value="A" class="option-input">
+                                <span>A. ${escapeHtml(q.option_a)}</span>
+                            </label>
+                            <label class="option-label">
+                                <input type="radio" name="${q.question_id}" value="B" class="option-input">
+                                <span>B. ${escapeHtml(q.option_b)}</span>
+                            </label>
+                            <label class="option-label">
+                                <input type="radio" name="${q.question_id}" value="C" class="option-input">
+                                <span>C. ${escapeHtml(q.option_c)}</span>
+                            </label>
+                            <label class="option-label">
+                                <input type="radio" name="${q.question_id}" value="D" class="option-input">
+                                <span>D. ${escapeHtml(q.option_d)}</span>
+                            </label>
+                        </div>
+                    `;
+                    area.innerHTML += html;
+                });
+
+                startTimer(data.quiz.time_limit * 60);
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('quizTitle').innerText = "Lỗi tải đề thi!";
+            }
+        }
+
+        // Xử lý Nộp bài
+        document.getElementById('quizForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if(!confirm("Bạn có chắc chắn muốn nộp bài không?")) return;
+
+            const answers = {};
+            questionsList.forEach(q => {
+                const selected = document.querySelector(`input[name="${q.question_id}"]:checked`);
+                if (selected) {
+                    answers[q.question_id] = selected.value;
+                }
+            });
+
+            const btn = document.querySelector('.btn-submit');
+            btn.innerText = "Đang chấm điểm...";
+            btn.disabled = true;
+
+            try {
+                // Lấy thông tin user từ LocalStorage (nếu có)
+                const userStr = localStorage.getItem('user_info');
+                const user = userStr ? JSON.parse(userStr) : { user_id: 2 }; // Mặc định ID 2 nếu chưa login
+
+                const res = await fetch(`http://localhost:3000/api/quizzes/${quizId}/submit`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        user_id: user.user_id,
+                        answers: answers 
+                    })
+                });
+                
+                const result = await res.json();
+                
+                alert(`🎉 KẾT QUẢ:\n\nĐiểm số: ${result.score}/10\nSố câu đúng: ${result.correct}/${result.total}`);
+                window.location.href = 'index.html';
+
+            } catch (error) {
+                alert("Lỗi khi nộp bài: " + error.message);
+                btn.innerText = "Nộp bài";
+                btn.disabled = false;
+            }
+        });
+
+        function startTimer(duration) {
+            let timer = duration, minutes, seconds;
+            const display = document.getElementById('timer');
+            
+            const interval = setInterval(function () {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    clearInterval(interval);
+                    alert("Hết giờ! Hệ thống sẽ tự nộp bài.");
+                    // document.getElementById('quizForm').requestSubmit(); // Tự động nộp
+                }
+            }, 1000);
+        }
+
+        loadQuiz();
+    </script>
 </body>
 </html>

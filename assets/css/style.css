@@ -44,3 +44,17 @@ body { background-color: var(--bg-color); display: flex; height: 100vh; color: v
 .tag { font-size: 0.75rem; padding: 4px 8px; border-radius: 12px; color: white; display: inline-block; margin-bottom: 5px; }
 .tag-danger { background-color: var(--danger-color); }
 .tag-warning { background-color: var(--accent-color); }
+
+/* DANH SÁCH THÔNG BÁO DẠNG ROW */
+.notification-list {
+    list-style: none;
+    padding: 0;
+    /* Bỏ scroll dọc */
+    /* max-height: 350px; overflow-y: auto; */
+    
+    /* FLEXBOX ĐỂ XẾP NGANG */
+    display: flex;
+    flex-direction: row; /* Hướng ngang */
+    flex-wrap: wrap;     /* Hết chỗ thì tự xuống dòng */
+    gap: 15px;           /* Khoảng cách giữa các thẻ */
+}

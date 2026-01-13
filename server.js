@@ -108,24 +108,44 @@ app.get('/api/materials/:id', (req, res) => {
     });
 });
 
-// 5. API DASHBOARD (THỐNG KÊ)
+// 5. API DASHBOARD (CẬP NHẬT)
 app.get('/api/dashboard/stats', (req, res) => {
+    // Lấy ID từ query hoặc mặc định là 2
     const userId = req.query.user_id || 2; 
+
+    // Query 1: Đếm tổng tài liệu
     const sqlDocs = "SELECT COUNT(*) as total FROM materials";
+    
+    // Query 2: Tính điểm trung bình của User
     const sqlAvg = "SELECT AVG(score) as avg_score FROM quiz_attempts WHERE user_id = ?";
-    const sqlChart = `SELECT q.title, qa.score FROM quiz_attempts qa 
+    
+    // Query 3: Lấy lịch sử 10 bài thi gần nhất để vẽ biểu đồ
+    const sqlChart = `SELECT q.title, qa.score, qa.completed_at 
+                      FROM quiz_attempts qa 
                       JOIN quizzes q ON qa.quiz_id = q.quiz_id 
-                      WHERE qa.user_id = ? ORDER qa.completed_at DESC LIMIT 5`;
+                      WHERE qa.user_id = ? 
+                      ORDER BY qa.completed_at ASC`; 
+                      // Lưu ý: ASC để vẽ từ cũ đến mới
 
     db.query(sqlDocs, (err, docs) => {
         if(err) return res.status(500).json(err);
+        
         db.query(sqlAvg, [userId], (err, avg) => {
             if(err) return res.status(500).json(err);
+            
             db.query(sqlChart, [userId], (err, chartData) => {
                 if(err) return res.status(500).json(err);
+                
+                // Log ra để kiểm tra xem có dữ liệu không
+                console.log("Dashboard Data:", {
+                    total: docs[0].total,
+                    avg: avg[0].avg_score,
+                    chart_len: chartData.length
+                });
+
                 res.json({
                     total_materials: docs[0].total,
-                    avg_score: avg[0].avg_score ? avg[0].avg_score.toFixed(1) : 0,
+                    avg_score: avg[0].avg_score ? parseFloat(avg[0].avg_score).toFixed(1) : 0,
                     chart_data: chartData
                 });
             });
@@ -136,6 +156,80 @@ app.get('/api/dashboard/stats', (req, res) => {
 // CHUYỂN HƯỚNG TRANG CHỦ VỀ ONBOARDING
 app.get('/', (req, res) => {
     res.redirect('/modules/onboarding/index.html');
+});
+// ==================== API QUIZ (MỚI) ====================
+
+// 1. Lấy danh sách các bài thi
+app.get('/api/quizzes', (req, res) => {
+    const sql = "SELECT * FROM quizzes ORDER BY created_at DESC";
+    db.query(sql, (err, result) => {
+        if (err) return res.status(500).json(err);
+        res.json(result);
+    });
+});
+
+// 2. Lấy nội dung đề thi + câu hỏi
+app.get('/api/quizzes/:id', (req, res) => {
+    const quizId = req.params.id;
+    
+    // Lấy thông tin đề thi
+    const sqlQuiz = "SELECT * FROM quizzes WHERE quiz_id = ?";
+    // Lấy danh sách câu hỏi (Không lấy đáp án đúng để lộ cho client xem trộm)
+    const sqlQuestions = "SELECT question_id, question_text, option_a, option_b, option_c, option_d FROM questions WHERE quiz_id = ?";
+
+    db.query(sqlQuiz, [quizId], (err, quizResult) => {
+        if (err) return res.status(500).json(err);
+        if (quizResult.length === 0) return res.status(404).json({message: "Không tìm thấy đề thi"});
+
+        db.query(sqlQuestions, [quizId], (err, questionResult) => {
+            if (err) return res.status(500).json(err);
+            // Trả về cả thông tin đề và danh sách câu hỏi
+            res.json({
+                quiz: quizResult[0],
+                questions: questionResult
+            });
+        });
+    });
+});
+
+// 3. Nộp bài và Chấm điểm (Server tự chấm để bảo mật)
+app.post('/api/quizzes/:id/submit', (req, res) => {
+    const quizId = req.params.id;
+    const { user_id, answers } = req.body; // answers là object { question_id: 'A', ... }
+
+    // Lấy đáp án đúng từ database để so sánh
+    const sqlOriginal = "SELECT question_id, correct_option FROM questions WHERE quiz_id = ?";
+    
+    db.query(sqlOriginal, [quizId], (err, questions) => {
+        if (err) return res.status(500).json(err);
+
+        let correctCount = 0;
+        let totalQuestions = questions.length;
+
+        // Thuật toán chấm điểm
+        questions.forEach(q => {
+            // So sánh đáp án user gửi lên với đáp án đúng trong DB
+            if (answers[q.question_id] === q.correct_option) {
+                correctCount++;
+            }
+        });
+
+        // Tính điểm thang 10
+        const score = totalQuestions === 0 ? 0 : (correctCount / totalQuestions) * 10;
+
+        // Lưu điểm vào lịch sử
+        const sqlSave = "INSERT INTO quiz_attempts (user_id, quiz_id, score) VALUES (?, ?, ?)";
+        db.query(sqlSave, [user_id || 2, quizId, score], (err, result) => {
+            if (err) return res.status(500).json(err);
+            
+            res.json({
+                message: "Đã chấm điểm xong!",
+                score: score.toFixed(1), // Làm tròn 1 số thập phân
+                correct: correctCount,
+                total: totalQuestions
+            });
+        });
+    });
 });
 
 // KHỞI ĐỘNG SERVER
