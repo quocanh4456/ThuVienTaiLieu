@@ -231,7 +231,58 @@ app.post('/api/quizzes/:id/submit', (req, res) => {
         });
     });
 });
+// ==================== API ADMIN (SỬA LỖI) ====================
 
+app.get('/api/admin/dashboard', (req, res) => {
+    // 1. Đếm tổng sinh viên
+    const sqlCount = "SELECT COUNT(*) as total FROM users";
+    
+    // 2. Tìm sinh viên có điểm thấp (Dưới 7.0)
+    // Lưu ý: Tên biến ở đây là 'sqlRisk'
+    const sqlRisk = `
+        SELECT u.user_id, u.full_name, u.email, AVG(qa.score) as avg_score 
+        FROM users u
+        JOIN quiz_attempts qa ON u.user_id = qa.user_id
+        GROUP BY u.user_id
+        HAVING avg_score < 7.0
+        ORDER BY avg_score ASC
+    `;
+
+    db.query(sqlCount, (err, countResult) => {
+        if (err) return res.status(500).json(err);
+        
+        // --- SỬA LỖI TẠI ĐÂY: Dùng đúng tên biến 'sqlRisk' ---
+        db.query(sqlRisk, (err, riskResult) => {
+            if (err) return res.status(500).json(err);
+            
+            // Đếm số lượng "Nguy cơ cao" (dưới 5.0)
+            const highRiskCount = riskResult.filter(s => s.avg_score < 5.0).length;
+
+            res.json({
+                total_students: countResult[0].total,
+                at_risk_count: highRiskCount,
+                n8n_sent: 15, // Số giả định
+                risk_list: riskResult
+            });
+        });
+    });
+});
+
+// API: Lấy chi tiết lịch sử thi của 1 sinh viên
+app.get('/api/admin/student-details/:id', (req, res) => {
+    const userId = req.params.id;
+    const sql = `
+        SELECT q.title, qa.score, qa.completed_at 
+        FROM quiz_attempts qa
+        JOIN quizzes q ON qa.quiz_id = q.quiz_id
+        WHERE qa.user_id = ?
+        ORDER BY qa.completed_at DESC
+    `;
+    db.query(sql, [userId], (err, results) => {
+        if (err) return res.status(500).json(err);
+        res.json(results);
+    });
+});
 // KHỞI ĐỘNG SERVER
 const PORT = 3000;
 app.listen(PORT, () => {
