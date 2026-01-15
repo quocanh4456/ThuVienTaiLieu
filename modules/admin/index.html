@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - EduPlatform</title>
     <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* GIỮ NGUYÊN CSS CŨ */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
@@ -40,18 +41,133 @@
         /* Bảng nhỏ trong Modal */
         .detail-table th { background: #eff6ff; color: #1e3a8a; }
         .detail-table td { font-size: 0.9rem; }
+        /* --- SIDEBAR STYLE CHUẨN (GIỐNG ẢNH 1) --- */
+        .sidebar {
+            width: 260px !important;
+            background-color: #111827 !important; /* Nền đen xanh đậm */
+            display: flex !important;
+            flex-direction: column !important;
+            padding: 25px 20px !important;
+            height: 100vh !important;
+            flex-shrink: 0 !important;
+            box-sizing: border-box !important;
+            position: sticky !important;
+            top: 0;
+        }
+
+        /* Logo EDUPLATFORM màu xanh đậm */
+        .logo {
+            font-size: 1.6rem !important;
+            font-weight: 900 !important;
+            color: #3b82f6 !important; /* Màu xanh thương hiệu */
+            text-transform: uppercase;
+            margin-bottom: 40px !important;
+            padding-left: 10px !important;
+            letter-spacing: 1px !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+
+        .nav-links {
+            list-style: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            flex-grow: 1 !important; /* Đẩy nút đăng xuất xuống đáy */
+        }
+
+        .nav-links li {
+            margin-bottom: 10px !important;
+        }
+
+        /* Style chung cho Link và Nút */
+        .nav-links a, .logout-btn {
+            text-decoration: none !important;
+            color: #9ca3af !important; /* Màu xám nhạt */
+            display: flex !important;
+            align-items: center !important; /* Căn giữa icon và chữ */
+            padding: 14px 16px !important;
+            border-radius: 12px !important;
+            transition: all 0.2s ease !important;
+            font-weight: 500 !important;
+            font-size: 0.95rem !important;
+            cursor: pointer !important;
+        }
+
+        /* Icon: Cố định độ rộng để chữ thẳng hàng */
+        .nav-icon {
+            width: 30px !important;
+            display: flex !important;
+            justify-content: center !important; /* Icon nằm giữa ô của nó */
+            margin-right: 10px !important;
+            font-size: 1.1rem !important;
+        }
+
+        /* Hiệu ứng Hover */
+        .nav-links a:hover, .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            color: white !important;
+        }
+
+        /* --- TRẠNG THÁI ACTIVE (NÚT ADMIN MÀU XANH) --- */
+        .nav-links a.active {
+            background-color: #3b82f6 !important; /* Nền xanh sáng */
+            color: white !important;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4) !important; /* Đổ bóng */
+            font-weight: 600 !important;
+        }
+
+        /* Khi active, icon đổi màu trắng */
+        .nav-links a.active i {
+            color: white !important;
+        }
+
+        /* Nút Đăng xuất (Màu đỏ, nằm đáy) */
+        .logout-btn {
+            margin-top: auto !important;
+            color: #ef4444 !important;
+            font-weight: 600 !important;
+        }
+        .logout-btn:hover {
+            background-color: rgba(239, 68, 68, 0.1) !important;
+        }
     </style>
 </head>
 <body>
     <nav class="sidebar">
-        <div class="logo">EduPlatform</div>
+        <div class="logo">EDUPLATFORM</div>
+
         <ul class="nav-links">
-            <li><a href="../dashboard/index.html"><span class="nav-icon">📊</span> Tổng quan</a></li>
-            <li><a href="../materials/index.html"><span class="nav-icon">📚</span> Thư viện</a></li>
-            <li><a href="../quiz/index.html"><span class="nav-icon">📝</span> Bài học & Quiz</a></li>
-            <li><a href="index.html" class="active"><span class="nav-icon">⚙️</span> Admin</a></li>
+            <li>
+                <a href="../dashboard/index.html">
+                    <span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span>
+                    Tổng quan
+                </a>
+            </li>
+            <li>
+                <a href="../materials/index.html">
+                    <span class="nav-icon"><i class="fa-solid fa-layer-group"></i></span>
+                    Thư viện
+                </a>
+            </li>
+            <li>
+                <a href="../quiz/index.html">
+                    <span class="nav-icon"><i class="fa-solid fa-pen-to-square"></i></span>
+                    Bài học & Quiz
+                </a>
+            </li>
+            <li>
+                <a href="index.html" class="active">
+                    <span class="nav-icon"><i class="fa-solid fa-gear"></i></span>
+                    Admin
+                </a>
+            </li>
         </ul>
-    </nav>
+
+        <a onclick="logout()" class="logout-btn">
+            <span class="nav-icon"><i class="fa-solid fa-right-from-bracket"></i></span>
+            Đăng xuất
+        </a>
+    </nav>  
 
     <main class="main-content">
         <header class="header">
