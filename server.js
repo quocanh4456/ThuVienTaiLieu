@@ -175,7 +175,17 @@ app.get('/api/quizzes/:id', (req, res) => {
     // Lấy thông tin đề thi
     const sqlQuiz = "SELECT * FROM quizzes WHERE quiz_id = ?";
     // Lấy danh sách câu hỏi (Không lấy đáp án đúng để lộ cho client xem trộm)
-    const sqlQuestions = "SELECT question_id, question_text, option_a, option_b, option_c, option_d FROM questions WHERE quiz_id = ?";
+    const sqlQuestions = `
+  SELECT 
+    question_id,
+    content AS question_text,
+    option_a,
+    option_b,
+    option_c,
+    option_d
+  FROM questions
+  WHERE quiz_id = ?
+`;
 
     db.query(sqlQuiz, [quizId], (err, quizResult) => {
         if (err) return res.status(500).json(err);
