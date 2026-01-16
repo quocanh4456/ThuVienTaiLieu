@@ -221,14 +221,42 @@
     </div>
 
     <script>
-        function sendAlert(name) {
+        async function sendAlert(name, userId) {
             const btn = event.currentTarget;
-            btn.innerHTML = '...'; btn.disabled = true;
-            setTimeout(() => {
-                alert(`✅ Đã gửi n8n nhắc nhở tới: ${name}`);
-                btn.innerHTML = 'Đã gửi';
-                btn.style.background = '#dcfce7'; btn.style.color = '#166534';
-            }, 800);
+            const originalHtml = btn.innerHTML;
+            
+            btn.innerHTML = '⏳ Đang gửi...';
+            btn.disabled = true;
+
+            try {
+                // Gọi API gửi email
+                const response = await fetch(`http://localhost:3000/api/admin/send-email/${userId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Thành công
+                    alert(`✅ Đã gửi email cảnh báo thành công tới ${name}!\n\nEmail: ${data.email}\nĐiểm TB: ${data.avgScore}/10`);
+                    btn.innerHTML = '✅ Đã gửi';
+                    btn.style.background = '#dcfce7';
+                    btn.style.color = '#166534';
+                } else {
+                    // Lỗi từ API
+                    alert(`❌ Lỗi: ${data.error || 'Không thể gửi email'}`);
+                    btn.innerHTML = originalHtml;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Lỗi:', error);
+                alert(`❌ Lỗi kết nối: ${error.message}`);
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }
         }
 
         // --- HÀM XỬ LÝ MODAL ---
@@ -329,7 +357,7 @@
                                 <button class="btn-action btn-view" onclick="viewDetails(${student.user_id}, '${student.full_name}')">
                                     Chi tiết
                                 </button>
-                                <button class="btn-action btn-warning" onclick="sendAlert('${student.full_name}')">
+                                <button class="btn-action btn-warning" onclick="sendAlert('${student.full_name}', ${student.user_id})">
                                     Gửi n8n
                                 </button>
                             </td>
