@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* GIỮ NGUYÊN CSS CŨ */
+        /* --- CSS CŨ GIỮ NGUYÊN --- */
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { text-align: left; padding: 12px; border-bottom: 1px solid #e2e8f0; }
         th { background-color: #f8fafc; color: #64748b; font-weight: 600; }
@@ -18,12 +18,11 @@
         .tag-danger { background-color: #ef4444; }
         .tag-warning { background-color: #f59e0b; }
 
-        /* --- CSS MỚI CHO MODAL (HỘP THOẠI CHI TIẾT) --- */
+        /* --- CSS CHO MODAL --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5); /* Nền tối mờ */
-            display: none; /* Mặc định ẩn */
-            justify-content: center; align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            display: none; justify-content: center; align-items: center;
             z-index: 1000;
         }
         .modal-content {
@@ -38,98 +37,43 @@
         .modal-close { cursor: pointer; font-size: 1.5rem; color: #94a3b8; }
         .modal-close:hover { color: #ef4444; }
         
-        /* Bảng nhỏ trong Modal */
+        /* Bảng trong Modal */
         .detail-table th { background: #eff6ff; color: #1e3a8a; }
         .detail-table td { font-size: 0.9rem; }
-        /* --- SIDEBAR STYLE CHUẨN (GIỐNG ẢNH 1) --- */
+
+        /* --- SIDEBAR STYLE --- */
         .sidebar {
             width: 260px !important;
-            background-color: #111827 !important; /* Nền đen xanh đậm */
-            display: flex !important;
-            flex-direction: column !important;
-            padding: 25px 20px !important;
-            height: 100vh !important;
-            flex-shrink: 0 !important;
-            box-sizing: border-box !important;
-            position: sticky !important;
-            top: 0;
+            background-color: #111827 !important;
+            display: flex !important; flex-direction: column !important;
+            padding: 25px 20px !important; height: 100vh !important;
+            flex-shrink: 0 !important; box-sizing: border-box !important;
+            position: sticky !important; top: 0;
         }
-
-        /* Logo EDUPLATFORM màu xanh đậm */
         .logo {
-            font-size: 1.6rem !important;
-            font-weight: 900 !important;
-            color: #3b82f6 !important; /* Màu xanh thương hiệu */
-            text-transform: uppercase;
-            margin-bottom: 40px !important;
-            padding-left: 10px !important;
-            letter-spacing: 1px !important;
-            display: flex !important;
-            align-items: center !important;
+            font-size: 1.6rem !important; font-weight: 900 !important;
+            color: #3b82f6 !important; text-transform: uppercase;
+            margin-bottom: 40px !important; padding-left: 10px !important;
+            display: flex !important; align-items: center !important;
         }
-
-        .nav-links {
-            list-style: none !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            flex-grow: 1 !important; /* Đẩy nút đăng xuất xuống đáy */
-        }
-
-        .nav-links li {
-            margin-bottom: 10px !important;
-        }
-
-        /* Style chung cho Link và Nút */
+        .nav-links { list-style: none !important; padding: 0 !important; margin: 0 !important; flex-grow: 1 !important; }
+        .nav-links li { margin-bottom: 10px !important; }
+        
         .nav-links a, .logout-btn {
-            text-decoration: none !important;
-            color: #9ca3af !important; /* Màu xám nhạt */
-            display: flex !important;
-            align-items: center !important; /* Căn giữa icon và chữ */
-            padding: 14px 16px !important;
-            border-radius: 12px !important;
-            transition: all 0.2s ease !important;
-            font-weight: 500 !important;
-            font-size: 0.95rem !important;
-            cursor: pointer !important;
+            text-decoration: none !important; color: #9ca3af !important;
+            display: flex !important; align-items: center !important;
+            padding: 14px 16px !important; border-radius: 12px !important;
+            transition: all 0.2s ease !important; font-weight: 500 !important;
+            font-size: 0.95rem !important; cursor: pointer !important;
         }
-
-        /* Icon: Cố định độ rộng để chữ thẳng hàng */
-        .nav-icon {
-            width: 30px !important;
-            display: flex !important;
-            justify-content: center !important; /* Icon nằm giữa ô của nó */
-            margin-right: 10px !important;
-            font-size: 1.1rem !important;
-        }
-
-        /* Hiệu ứng Hover */
-        .nav-links a:hover, .logout-btn:hover {
-            background-color: rgba(255, 255, 255, 0.05) !important;
-            color: white !important;
-        }
-
-        /* --- TRẠNG THÁI ACTIVE (NÚT ADMIN MÀU XANH) --- */
-        .nav-links a.active {
-            background-color: #3b82f6 !important; /* Nền xanh sáng */
-            color: white !important;
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4) !important; /* Đổ bóng */
-            font-weight: 600 !important;
-        }
-
-        /* Khi active, icon đổi màu trắng */
-        .nav-links a.active i {
-            color: white !important;
-        }
-
-        /* Nút Đăng xuất (Màu đỏ, nằm đáy) */
-        .logout-btn {
-            margin-top: auto !important;
-            color: #ef4444 !important;
-            font-weight: 600 !important;
-        }
-        .logout-btn:hover {
-            background-color: rgba(239, 68, 68, 0.1) !important;
-        }
+        .nav-icon { width: 30px !important; display: flex !important; justify-content: center !important; margin-right: 10px !important; font-size: 1.1rem !important; }
+        
+        .nav-links a:hover, .logout-btn:hover { background-color: rgba(255, 255, 255, 0.05) !important; color: white !important; }
+        .nav-links a.active { background-color: #3b82f6 !important; color: white !important; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4) !important; font-weight: 600 !important; }
+        .nav-links a.active i { color: white !important; }
+        
+        .logout-btn { margin-top: auto !important; color: #ef4444 !important; font-weight: 600 !important; }
+        .logout-btn:hover { background-color: rgba(239, 68, 68, 0.1) !important; }
     </style>
 </head>
 <body>
@@ -159,6 +103,13 @@
                 <a href="index.html" class="active">
                     <span class="nav-icon"><i class="fa-solid fa-gear"></i></span>
                     Admin
+                </a>
+            </li>
+
+            <li style="margin-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 15px;">
+                <a href="http://localhost:8088/superset/dashboard/3/?native_filters_key=_uh5PIz-c1Q" target="_blank" style="color: #22d3ee !important;">
+                    <span class="nav-icon"><i class="fa-solid fa-chart-simple"></i></span>
+                    Phân tích nâng cao
                 </a>
             </li>
         </ul>
@@ -221,6 +172,16 @@
     </div>
 
     <script>
+        // --- HÀM ĐĂNG XUẤT (MỚI THÊM) ---
+        function logout() {
+            if (confirm("Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?")) {
+                localStorage.removeItem('user'); // Xóa user khỏi bộ nhớ
+                // Chuyển về trang Onboarding (Lùi ra 2 cấp thư mục)
+                window.location.href = '../../modules/onboarding/index.html';
+            }
+        }
+
+        // Hàm giả lập gửi n8n
         function sendAlert(name) {
             const btn = event.currentTarget;
             btn.innerHTML = '...'; btn.disabled = true;
@@ -236,9 +197,8 @@
             document.getElementById('detailModal').style.display = 'none';
         }
 
-        // Hàm xem chi tiết (Gọi API mới)
+        // Hàm xem chi tiết (Gọi API Server)
         async function viewDetails(userId, name) {
-            // 1. Hiện modal lên trước
             const modal = document.getElementById('detailModal');
             const title = document.getElementById('modalTitle');
             const body = document.getElementById('modalBody');
@@ -248,13 +208,11 @@
             body.innerHTML = '<p style="text-align:center;">⏳ Đang lấy dữ liệu...</p>';
 
             try {
-                // 2. Gọi API lấy điểm chi tiết
                 const res = await fetch(`http://localhost:3000/api/admin/student-details/${userId}`);
                 const details = await res.json();
 
-                // 3. Vẽ bảng chi tiết
                 if (details.length === 0) {
-                    body.innerHTML = '<p style="color:red;">Sinh viên này chưa làm bài nào (Lỗi dữ liệu).</p>';
+                    body.innerHTML = '<p style="color:red;">Sinh viên này chưa làm bài nào.</p>';
                     return;
                 }
 
@@ -267,12 +225,10 @@
                 `;
 
                 details.forEach(d => {
-                    // Tô màu điểm số
-                    let scoreColor = '#166534'; // Xanh
-                    if(d.score < 5) scoreColor = '#dc2626'; // Đỏ
-                    else if(d.score < 7) scoreColor = '#ca8a04'; // Vàng
+                    let scoreColor = '#166534'; 
+                    if(d.score < 5) scoreColor = '#dc2626'; 
+                    else if(d.score < 7) scoreColor = '#ca8a04'; 
 
-                    // Format ngày
                     const date = new Date(d.completed_at).toLocaleDateString('vi-VN');
 
                     html += `
@@ -293,7 +249,7 @@
             }
         }
 
-        // --- HÀM LOAD DỮ LIỆU CHÍNH ---
+        // --- HÀM LOAD DỮ LIỆU CHÍNH (DASHBOARD) ---
         async function loadAdminData() {
             try {
                 const res = await fetch('http://localhost:3000/api/admin/dashboard');
@@ -330,7 +286,7 @@
                                     Chi tiết
                                 </button>
                                 <button class="btn-action btn-warning" onclick="sendAlert('${student.full_name}')">
-                                    Gửi n8n
+                                    Gửi email
                                 </button>
                             </td>
                         </tr>
@@ -341,6 +297,7 @@
             } catch (error) { console.error(error); }
         }
 
+        // Chạy khi tải trang
         loadAdminData();
     </script>
 </body>
