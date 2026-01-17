@@ -67,46 +67,118 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     });
 });
 
-// 3. API LẤY DANH SÁCH TÀI LIỆU (CÓ TÌM KIẾM & LỌC)
+// ==============================
+// 3) API LẤY DANH SÁCH TÀI LIỆU (CÓ TÌM KIẾM & LỌC)
+// ==============================
+// Endpoint: GET /api/materials
+// Mục đích:
+// - Trả về danh sách tài liệu trong bảng materials
+// - Hỗ trợ:
+//   + Tìm kiếm theo từ khóa (q) trong title hoặc description
+//   + Lọc theo topic
+// - Sắp xếp theo created_at giảm dần (mới nhất lên đầu)
+//
+// Ví dụ gọi:
+// - /api/materials
+// - /api/materials?q=java
+// - /api/materials?topic=Web
+// - /api/materials?q=java&topic=Web
 app.get('/api/materials', (req, res) => {
-    const keyword = req.query.q;      // Lấy từ khóa tìm kiếm
-    const topic = req.query.topic;    // Lấy chủ đề lọc
 
-    let sql = "SELECT * FROM materials WHERE 1=1"; // Mẹo: 1=1 để dễ nối chuỗi AND
+    // Lấy query param "q" (keyword tìm kiếm) từ URL
+    // VD: /api/materials?q=java  => keyword = "java"
+    const keyword = req.query.q;
+
+    // Lấy query param "topic" (lọc chủ đề) từ URL
+    // VD: /api/materials?topic=Web => topic = "Web"
+    const topic = req.query.topic;
+
+    // Khởi tạo câu SQL base
+    // "WHERE 1=1" là mẹo để nối thêm điều kiện AND dễ hơn (không cần xử lý trường hợp điều kiện đầu tiên)
+    let sql = "SELECT * FROM materials WHERE 1=1";
+
+    // params là danh sách tham số tương ứng với các dấu "?" trong SQL
+    // Dùng params giúp tránh SQL Injection (ít nhất ở mức cơ bản)
     let params = [];
 
-    // 1. Xử lý tìm kiếm từ khóa (Tìm trong Tên hoặc Mô tả)
+    // ------------------------------
+    // 1) TÌM KIẾM THEO KEYWORD
+    // ------------------------------
+    // Nếu user có truyền keyword (q) thì:
+    // - Tìm trong title hoặc description
+    // - Dùng LIKE '%keyword%' để tìm tương đối (chứa chuỗi)
     if (keyword) {
         sql += " AND (title LIKE ? OR description LIKE ?)";
-        const searchStr = `%${keyword}%`; // % bao quanh để tìm tương đối
-        params.push(searchStr, searchStr);
+        const searchStr = `%${keyword}%`;   // ví dụ "java" -> "%java%"
+        params.push(searchStr, searchStr);  // 2 dấu ? nên push 2 lần
     }
 
-    // 2. Xử lý lọc theo chủ đề (Nếu user chọn filter)
+    // ------------------------------
+    // 2) LỌC THEO TOPIC
+    // ------------------------------
+    // Nếu user truyền topic thì:
+    // - Lọc theo cột topic
+    // - Dùng LIKE để "nới lỏng" matching (đỡ bị case mismatch / khác format)
+    //   VD: topic=web vẫn match "Web" nếu DB lưu không thống nhất (nhưng LIKE mặc định MySQL có thể case-insensitive tuỳ collation)
     if (topic) {
-        // Lưu ý: Trong DB bạn lưu là "Web", "AI". Nếu input gửi lên "web" thường thì ta dùng LIKE cho chắc
-        sql += " AND topic LIKE ?"; 
+        sql += " AND topic LIKE ?";
         params.push(`%${topic}%`);
     }
 
+    // ------------------------------
+    // 3) SẮP XẾP KẾT QUẢ
+    // ------------------------------
+    // created_at DESC => mới nhất lên đầu
     sql += " ORDER BY created_at DESC";
 
+    // Thực thi query với params
     db.query(sql, params, (err, result) => {
+        // Nếu lỗi DB (syntax, connect,...) trả 500
         if (err) return res.status(500).json(err);
+
+        // Trả về danh sách tài liệu (array)
         res.json(result);
     });
 });
 
-// 4. API LẤY CHI TIẾT 1 TÀI LIỆU (QUAN TRỌNG ĐỂ SỬA LỖI CỦA BẠN)
+
+// ==============================
+// 4) API LẤY CHI TIẾT 1 TÀI LIỆU
+// ==============================
+// Endpoint: GET /api/materials/:id
+// Mục đích:
+// - Trả về chi tiết 1 tài liệu theo material_id
+// - Dùng cho trang detail (xem trước + download)
+//
+// Ví dụ gọi:
+// - /api/materials/10  => lấy material có material_id = 10
 app.get('/api/materials/:id', (req, res) => {
+
+    // Lấy param :id từ URL
+    // VD: /api/materials/10 => id = "10"
     const id = req.params.id;
+
+    // SQL query lấy đúng 1 record theo material_id
+    // Dùng "?" để bind param chống SQL injection
     const sql = "SELECT * FROM materials WHERE material_id = ?";
+
     db.query(sql, [id], (err, result) => {
+        // Nếu lỗi DB => 500
         if (err) return res.status(500).json(err);
-        if (result.length === 0) return res.status(404).json({ message: "Không tìm thấy" });
+
+        // Nếu không có bản ghi nào => trả 404
+        // result là array, nếu length = 0 nghĩa là không tìm thấy
+        if (result.length === 0) {
+            return res.status(404).json({ message: "Không tìm thấy" });
+        }
+
+        // Trả về dữ liệu chi tiết
+        // NOTE: Hiện tại trả array (result) nên frontend phải data[0]
+        // Thông thường API detail sẽ trả object: result[0]
         res.json(result);
     });
 });
+
 
 // 5. API DASHBOARD (CẬP NHẬT)
 app.get('/api/dashboard/stats', (req, res) => {
