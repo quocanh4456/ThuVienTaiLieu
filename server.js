@@ -3,8 +3,13 @@ const mysql = require('mysql');
 const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
+const nodemailer = require('nodemailer');
 const app = express();
-
+// === THÊM ĐOẠN NÀY VÀO ===
+app.use((req, res, next) => {
+    console.log(`👉 Có người gọi vào: [${req.method}] ${req.url}`);
+    next();
+});
 // CẤU HÌNH SERVER
 app.use(cors());
 app.use(express.json());
@@ -12,11 +17,30 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname)); // Cho phép truy cập file tĩnh (html, css)
 app.use('/uploads', express.static('uploads')); // Cho phép truy cập thư mục uploads
 
+// ==================== CẤU HÌNH NODEMAILER (EMAIL) ====================
+const transporter = nodemailer.createTransport({
+    service: 'gmail', // Nếu dùng Gmail
+    auth: {
+        user: 'tranquockhanhxxx@gmail.com', // 👈 THAY BẰNG EMAIL CỦA BẠN
+        pass: 'amlv cilj haez jbpw'     // 👈 THAY BẰNG APP PASSWORD (Không phải mật khẩu thường)
+    }
+});
+
+// Kiểm tra kết nối email
+transporter.verify((error, success) => {
+    if (error) {
+        console.log('⚠️ Email chưa cấu hình:', error.message);
+    } else {
+        console.log('✅ Email đã sẵn sàng gửi');
+    }
+});
+
 // KẾT NỐI DATABASE
 const db = mysql.createConnection({
     host: 'localhost',
+    port: 3306,
     user: 'root',
-    password: '',
+    password: 'root',
     database: 'edu_platform'
 });
 
@@ -283,6 +307,188 @@ app.get('/api/admin/student-details/:id', (req, res) => {
         res.json(results);
     });
 });
+// ==================== API TÍCH HỢP N8N ====================
+
+// API để n8n kích hoạt việc kiểm tra và gửi thông báo
+// ==================== API TÍCH HỢP N8N (ĐÃ SỬA) ====================
+
+app.post('/api/admin/check-and-notify-risk', (req, res) => {
+    console.log("👉 [DEBUG] N8N đã gọi vào API check-and-notify-risk"); // Log để kiểm tra
+
+    // 1. Bảo mật
+    const N8N_API_KEY = 'your_super_secret_key_123'; 
+    if (req.headers['x-n8n-api-key'] !== N8N_API_KEY) {
+        return res.status(401).json({ message: 'Unauthorized: Invalid API Key' });
+    }
+
+    // 2. URL Webhook (Đã điền cứng, không cần check if nữa)
+    const N8N_WEBHOOK_URL = 'https://thanh1234.app.n8n.cloud/webhook/canh-bao-hoc-tap'; 
+
+    // 3. Query tìm sinh viên điểm thấp
+    const sqlRisk = `
+        SELECT u.user_id, u.full_name, u.email, AVG(qa.score) as avg_score
+        FROM users u
+        JOIN quiz_attempts qa ON u.user_id = qa.user_id
+        GROUP BY u.user_id, u.full_name, u.email
+        HAVING avg_score < 5.0
+    `;
+
+    db.query(sqlRisk, (err, students) => {
+        if (err) {
+            console.error("Lỗi SQL:", err);
+            return res.status(500).json(err);
+        }
+        
+        if (students.length === 0) {
+            return res.json({ message: 'Không có sinh viên nào cần thông báo.' });
+        }
+
+        console.log(`Tìm thấy ${students.length} sinh viên. Bắt đầu gửi sang n8n...`);
+
+        // 4. Với mỗi sinh viên, lưu notification và gọi webhook của n8n
+        console.log("=== BẮT ĐẦU GỬI EMAIL ===");
+        
+        // Dùng map để tạo ra danh sách các lời hứa (Promise) xử lý song song
+        const emailPromises = students.map((student, index) => {
+            const title = 'Cảnh báo kết quả học tập';
+            const message = `Chào ${student.full_name}, hệ thống ghi nhận điểm trung bình các bài quiz của bạn là ${parseFloat(student.avg_score).toFixed(1)}. Vui lòng tập trung hơn vào việc học và làm bài.`;
+
+            // Log ra tên email đang chuẩn bị gửi
+            console.log(`📤 [${index + 1}/${students.length}] Đang gửi tới: ${student.email} (${student.full_name})`);
+
+            // a. Lưu vào DB (Không cần await để code chạy nhanh, nhưng log lỗi nếu có)
+            const sqlSaveNotif = "INSERT INTO notifications (user_id, title, message, type) VALUES (?, ?, ?, ?)";
+            db.query(sqlSaveNotif, [student.user_id, title, message, 'warning'], (err) => {
+                if (err) console.error(`❌ Lỗi lưu DB cho ${student.full_name}:`, err.message);
+            });
+
+            // b. Gọi webhook của n8n (Quan trọng: Thêm return để Promise biết khi nào xong)
+            return fetch(N8N_WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    email: student.email, 
+                    name: student.full_name, 
+                    message: message 
+                })
+            })
+            .then(res => {
+                if (res.ok) {
+                    console.log(`✅ Đã gửi thành công sang n8n: ${student.email}`);
+                } else {
+                    console.log(`⚠️ N8N từ chối (Status ${res.status}): ${student.email}`);
+                }
+            })
+            .catch(err => console.error(`❌ Lỗi mạng khi gọi n8n cho ${student.email}:`, err.message));
+        });
+
+        // Đợi tất cả email được gửi đi hết rồi mới báo cho Frontend biết
+        Promise.all(emailPromises).then(() => {
+            console.log("=== KẾT THÚC QUÁ TRÌNH GỬI ===");
+            res.json({ message: `Đã xử lý và gửi yêu cầu cho ${students.length} sinh viên.` });
+        });
+
+       
+    });
+});
+
+// API để client (frontend) lấy danh sách thông báo của 1 user
+app.get('/api/notifications/user/:userId', (req, res) => {
+    const userId = req.params.userId;
+    const sql = "SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC";
+    db.query(sql, [userId], (err, results) => {
+        if (err) return res.status(500).json(err);
+        res.json(results);
+    });
+});
+
+// ==================== API GỬI EMAIL ====================
+// API: Gửi email cảnh báo cho sinh viên (Khi nhấn "Gửi n8n")
+app.post('/api/admin/send-email/:userId', (req, res) => {
+    const userId = req.params.userId;
+
+    // 1. Lấy thông tin sinh viên từ database
+    const sqlUser = "SELECT full_name, email, AVG(qa.score) as avg_score FROM users u LEFT JOIN quiz_attempts qa ON u.user_id = qa.user_id WHERE u.user_id = ? GROUP BY u.user_id";
+    
+    db.query(sqlUser, [userId], (err, results) => {
+        if (err) {
+            console.error('❌ Lỗi lấy thông tin sinh viên:', err);
+            return res.status(500).json({ error: 'Lỗi truy vấn database' });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Không tìm thấy sinh viên' });
+        }
+
+        const student = results[0];
+        const avgScore = student.avg_score ? parseFloat(student.avg_score).toFixed(1) : 'Chưa có dữ liệu';
+
+        // 2. Soạn nội dung email
+        const subject = '🚨 Thông báo kết quả học tập';
+        const htmlContent = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #d32f2f;">Cảnh báo Kết quả Học tập</h2>
+                <p>Chào <strong>${student.full_name}</strong>,</p>
+                
+                <p>Hệ thống EduPlatform ghi nhận rằng điểm trung bình các bài quiz của bạn là <strong style="color: #d32f2f;">${avgScore}/10</strong></p>
+                
+                <p>Để cải thiện kết quả học tập, chúng tôi khuyến nghị bạn:</p>
+                <ul>
+                    <li>Tìm hiểu lại các bài học đã làm sai</li>
+                    <li>Ôn tập kỹ lưỡng trước khi làm bài thi</li>
+                    <li>Tham khảo tài liệu trong thư viện học liệu</li>
+                    <li>Liên hệ với giáo viên nếu cần hỗ trợ thêm</li>
+                </ul>
+
+                <p style="background-color: #f5f5f5; padding: 10px; border-radius: 5px;">
+                    <strong>Hạn chót cải thiện:</strong> Vui lòng nâng cao điểm trung bình trước kỳ học tiếp theo.
+                </p>
+
+                <p>Trân trọng,<br><strong>Đội ngũ EduPlatform</strong></p>
+                <hr>
+                <p style="font-size: 0.85rem; color: #999;">
+                    Đây là email tự động. Vui lòng không trả lời trực tiếp.
+                </p>
+            </div>
+        `;
+
+        // 3. Gửi email
+        const mailOptions = {
+            from: 'tranquockhanhxxx@gmail.com', // 👈 THAY BẰNG EMAIL CỦA BẠN
+            to: student.email,
+            subject: subject,
+            html: htmlContent
+        };
+
+        transporter.sendMail(mailOptions, (err, info) => {
+            if (err) {
+                console.error('❌ Lỗi gửi email:', err.message);
+                return res.status(500).json({ 
+                    error: 'Không thể gửi email',
+                    details: err.message 
+                });
+            }
+
+            // 4. Lưu vào database (log)
+            const sqlLog = "INSERT INTO notifications (user_id, title, message, type) VALUES (?, ?, ?, ?)";
+            const title = 'Cảnh báo kết quả học tập';
+            const message = `Hệ thống đã gửi email cảnh báo. Điểm trung bình: ${avgScore}/10`;
+            
+            db.query(sqlLog, [userId, title, message, 'warning'], (err) => {
+                if (err) console.error('⚠️ Lỗi lưu log notification:', err.message);
+            });
+
+            console.log(`✅ Đã gửi email thành công tới: ${student.email}`);
+            res.json({ 
+                success: true, 
+                message: `Đã gửi email cảnh báo tới ${student.full_name}`,
+                email: student.email,
+                avgScore: avgScore
+            });
+        });
+    });
+});
+
 // KHỞI ĐỘNG SERVER
 const PORT = 3000;
 app.listen(PORT, () => {
