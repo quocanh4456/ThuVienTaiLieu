@@ -1,97 +1,276 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+    <!-- Khai báo bộ mã UTF-8 để hiển thị tiếng Việt đúng -->
     <meta charset="UTF-8">
+
+    <!-- Tiêu đề hiển thị trên tab trình duyệt -->
     <title>Chi tiết tài liệu - EduPlatform</title>
+
+    <!-- Import CSS chung của dự án (layout sidebar, main-content, tag, v.v.) -->
     <link rel="stylesheet" href="../../assets/css/style.css">
+
     <style>
-        .preview-box { width: 100%; height: 600px; background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0; margin-top: 20px; }
-        .info-box { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); height: fit-content; }
-        .btn-download { display: block; width: 100%; padding: 12px; background: var(--success-color); color: white; text-align: center; border-radius: 8px; text-decoration: none; font-weight: bold; margin-bottom: 20px; cursor: pointer; border: none; }
+        /* 
+          preview-box:
+          - Khung hiển thị "xem trước" tài liệu (PDF iframe / ảnh / video)
+          - height 600px giúp nội dung xem trước đủ lớn
+          - display flex + center để khi đang loading hoặc không hỗ trợ preview thì nội dung nằm giữa
+        */
+        .preview-box {
+            width: 100%;
+            height: 600px;
+            background: #f1f5f9;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e2e8f0;
+            margin-top: 20px;
+        }
+
+        /*
+          info-box:
+          - Hộp thông tin bên phải (download + topic + type + date + description)
+          - shadow nhẹ để nổi bật
+          - height: fit-content để hộp chỉ cao vừa đủ theo nội dung
+        */
+        .info-box {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        /*
+          btn-download:
+          - Thẻ <a> được style như một nút bấm
+          - width 100% để chiếm toàn bộ chiều ngang info-box
+          - cursor pointer để giống button
+        */
+        .btn-download {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: var(--success-color);
+            color: white;
+            text-align: center;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-bottom: 20px;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Hover làm mờ nhẹ để tạo feedback */
         .btn-download:hover { opacity: 0.9; }
     </style>
 </head>
+
 <body>
+    <!-- Sidebar điều hướng (nằm bên trái) -->
     <nav class="sidebar">
+        <!-- Logo/Brand -->
         <div class="logo">EduPlatform</div>
+
+        <!-- Danh sách link điều hướng -->
         <ul class="nav-links">
-            <li><a href="../dashboard/index.html"><span class="nav-icon">📊</span> Tổng quan</a></li>
-            <li><a href="index.html" class="active"><span class="nav-icon">📚</span> Thư viện</a></li>
-            <li><a href="../quiz/index.html"><span class="nav-icon">📝</span> Bài học & Quiz</a></li>
+            <!-- Link sang trang Dashboard -->
+            <li>
+                <a href="../dashboard/index.html">
+                    <span class="nav-icon">📊</span> Tổng quan
+                </a>
+            </li>
+
+            <!-- Link sang trang Thư viện (đang active) -->
+            <li>
+                <a href="index.html" class="active">
+                    <span class="nav-icon">📚</span> Thư viện
+                </a>
+            </li>
+
+            <!-- Link sang trang Quiz -->
+            <li>
+                <a href="../quiz/index.html">
+                    <span class="nav-icon">📝</span> Bài học & Quiz
+                </a>
+            </li>
         </ul>
     </nav>
 
+    <!-- Main content: chia 2 cột (trái preview, phải info) -->
     <main class="main-content" style="grid-template-columns: 2fr 1fr;">
+        <!-- Cột trái: Back + Title + Preview -->
         <div>
+            <!-- Link quay lại trang thư viện -->
             <a href="index.html" style="color: #64748b; text-decoration: none;">← Quay lại thư viện</a>
+
+            <!-- Tiêu đề tài liệu: lúc đầu là loading, sau đó JS sẽ set bằng m.title -->
             <h1 id="docTitle" style="margin-top: 15px;">Đang tải dữ liệu...</h1>
-            
+
+            <!-- Khung preview: lúc đầu hiển thị text loading, sau JS render iframe/img/video -->
             <div class="preview-box" id="previewArea">
                 <p>Đang tải bản xem trước...</p>
             </div>
         </div>
 
+        <!-- Cột phải: Download + metadata -->
         <div class="info-box">
+            <!-- Nút download:
+                 - href ban đầu là "#"
+                 - JS sẽ set href thành đường dẫn file thực tế
+                 - target="_blank" để mở tab mới (tránh mất trang hiện tại)
+            -->
             <a id="btnDownload" href="#" target="_blank" class="btn-download">⬇ Tải xuống ngay</a>
-            
+
+            <!-- Thông tin chủ đề: JS set nội dung vào span#docTopic -->
             <p><strong>Chủ đề:</strong> <span id="docTopic">...</span></p>
+
+            <!-- Thông tin loại file: JS set nội dung vào span#docType -->
+            <!-- class="tag" để dùng style tag từ CSS chung -->
             <p><strong>Loại file:</strong> <span class="tag" id="docType">...</span></p>
+
+            <!-- Ngày đăng: JS set nội dung vào span#docDate -->
             <p><strong>Ngày đăng:</strong> <span id="docDate">...</span></p>
+
+            <!-- Line phân cách phần metadata và mô tả -->
             <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+
             <p><strong>Mô tả:</strong></p>
+
+            <!-- Mô tả: JS set nội dung vào p#docDesc -->
             <p id="docDesc" style="color: #64748b; font-size: 0.95rem; line-height: 1.5;">...</p>
         </div>
     </main>
 
     <script>
-        // 1. Lấy ID từ trên thanh địa chỉ
+        /**
+         * ==============================
+         * 1) LẤY ID TỪ QUERY STRING
+         * ==============================
+         * Ví dụ URL: detail.html?id=5
+         * window.location.search = "?id=5"
+         * URLSearchParams giúp parse query string dễ dàng
+         */
         const params = new URLSearchParams(window.location.search);
+
+        // Lấy giá trị tham số "id"
         const id = params.get('id');
 
+        /**
+         * Nếu không có id => user truy cập sai đường dẫn
+         * - alert để báo lỗi
+         * - redirect về trang thư viện (index.html)
+         */
         if (!id) {
             alert("Không tìm thấy ID tài liệu!");
             window.location.href = 'index.html';
         }
 
-        // 2. Gọi API để lấy dữ liệu
+        /**
+         * ==============================
+         * 2) HÀM GỌI API LẤY CHI TIẾT
+         * ==============================
+         * - Gọi GET /api/materials/:id
+         * - Parse JSON
+         * - Hiển thị thông tin và preview
+         */
         async function loadDetail() {
             try {
+                /**
+                 * Gọi API backend lấy detail material theo id
+                 * NOTE: đang hardcode "http://localhost:3000"
+                 */
                 const res = await fetch(`http://localhost:3000/api/materials/${id}`);
-                const data = await res.json();
-                
-                // Vì API trả về mảng [ {id:1, title:...} ] nên ta lấy phần tử số 0
-                const m = data[0]; 
 
+                /**
+                 * Parse response JSON
+                 * NOTE: nếu server trả về không phải JSON hoặc lỗi mạng -> sẽ throw và nhảy vào catch
+                 */
+                const data = await res.json();
+
+                /**
+                 * Backend hiện tại trả về mảng result (MySQL):
+                 *   [ { material_id: ..., title: ..., ... } ]
+                 * nên frontend lấy phần tử đầu tiên
+                 */
+                const m = data[0];
+
+                /**
+                 * Nếu không có data (m undefined):
+                 * - update title báo không tồn tại
+                 * - return để dừng xử lý tiếp
+                 */
                 if (!m) {
                     document.getElementById('docTitle').innerText = "Tài liệu không tồn tại!";
                     return;
                 }
 
-                // 3. Hiển thị thông tin lên màn hình
+                /**
+                 * ==============================
+                 * 3) HIỂN THỊ THÔNG TIN LÊN UI
+                 * ==============================
+                 * - innerText/textContent dùng để set text (an toàn hơn innerHTML)
+                 * - docType: hiển thị uppercase để đẹp
+                 * - docDesc: fallback nếu không có mô tả
+                 * - docDate: format theo locale vi-VN
+                 */
                 document.getElementById('docTitle').innerText = m.title;
                 document.getElementById('docTopic').innerText = m.topic;
                 document.getElementById('docType').innerText = m.type ? m.type.toUpperCase() : 'FILE';
                 document.getElementById('docDesc').innerText = m.description || "Không có mô tả.";
                 document.getElementById('docDate').innerText = new Date(m.created_at).toLocaleDateString('vi-VN');
 
-                // 4. Xử lý đường dẫn file
+                /**
+                 * ==============================
+                 * 4) XỬ LÝ ĐƯỜNG DẪN FILE
+                 * ==============================
+                 * m.link thường lưu dạng tương đối, ví dụ: "uploads/xxx.pdf"
+                 * - Nếu link chưa có "http" => thêm base url backend vào trước
+                 * - Sau đó set cho nút download
+                 */
                 let fileUrl = m.link;
-                // Nếu link chưa có http://localhost:3000 thì thêm vào
+
+                // Nếu link là path tương đối thì thêm base URL
                 if (fileUrl && !fileUrl.startsWith('http')) {
                     fileUrl = `http://localhost:3000/${fileUrl}`;
                 }
+
+                // Gán href cho nút tải xuống
                 document.getElementById('btnDownload').href = fileUrl;
 
-                // 5. Xử lý Preview (Xem trước)
+                /**
+                 * ==============================
+                 * 5) XỬ LÝ PREVIEW (XEM TRƯỚC)
+                 * ==============================
+                 * - Dựa trên m.type (đã lưu trong DB) để quyết định render preview
+                 * - pdf: iframe
+                 * - image: img
+                 * - video/mp4: video tag
+                 * - khác: thông báo không hỗ trợ
+                 *
+                 * NOTE: dùng innerHTML để render nhanh, nhưng nếu muốn an toàn hơn có thể tạo element bằng createElement.
+                 */
                 const preview = document.getElementById('previewArea');
+
+                // Normalize type về chữ thường để so sánh
                 const type = m.type ? m.type.toLowerCase() : '';
 
+                // Preview PDF bằng iframe
                 if (type === 'pdf') {
                     preview.innerHTML = `<iframe src="${fileUrl}" width="100%" height="100%" style="border:none;"></iframe>`;
+
+                // Preview ảnh (jpg/png/jpeg/gif)
                 } else if (['jpg', 'png', 'jpeg', 'gif'].includes(type)) {
                     preview.innerHTML = `<img src="${fileUrl}" style="max-width:100%; max-height:100%; object-fit:contain;">`;
+
+                // Preview video (type = 'video' hoặc 'mp4')
                 } else if (type === 'video' || type === 'mp4') {
                     preview.innerHTML = `<video controls width="100%" height="100%"><source src="${fileUrl}" type="video/mp4"></video>`;
+
+                // Các định dạng khác không hỗ trợ xem trước
                 } else {
                     preview.innerHTML = `
                         <div style="text-align:center;">
@@ -103,11 +282,20 @@
                 }
 
             } catch (error) {
+                /**
+                 * catch:
+                 * - bắt lỗi network (fetch fail)
+                 * - lỗi parse JSON
+                 * - lỗi runtime khác
+                 */
                 console.error(error);
                 alert("Lỗi tải dữ liệu: " + error.message);
             }
         }
 
+        /**
+         * Gọi loadDetail ngay khi script chạy (tức là khi trang được load)
+         */
         loadDetail();
     </script>
 </body>
